@@ -1,0 +1,71 @@
+/* app.wxss — 记账花哪去了「梦幻星语」全局主题 */
+page {
+  /* 主题色板（与界面设计稿一致） */
+  --sky-top: #6E5AA8;
+  --sky-mid: #9B84CB;
+  --sky-bottom: #F5CBDD;
+  --glass: rgba(255, 255, 255, .55);
+  --glass-strong: rgba(255, 255, 255, .75);
+  --glass-border: rgba(255, 255, 255, .75);
+  --ink: #4A3B66;
+  --ink-soft: #8577A0;
+  --text-light: #FFF7FB;
+  --gold: #FFD977;
+  --berry: #E4789F;
+  --mint: #7ED9C4;
+  --lilac: #B79CEA;
+  --sky-acc: #8FB7EA;
+  --wxgreen: #3EBB6E;
+  --tabbar-h: 72rpx;
+
+  background: linear-gradient(180deg, #6E5AA8 0%, #9B84CB 40%, #F5CBDD 100%);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Noto Sans SC", sans-serif;
+  font-size: 28rpx;
+}
+
+/* 页面内容容器：置于星语背景之上，底部预留 tabBar 空间 */
+.page {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+}
+
+/* 自定义导航栏（系统胶囊由微信原生绘制在右上角） */
+.wx-nav {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  height: 88rpx;
+  padding: 0 32rpx;
+}
+.wx-nav .nav-title {
+  font-family: 'ZCOOL KuaiLe', cursive;
+  font-weight: 700;
+  font-size: 36rpx;
+  color: #fff;
+  text-shadow: 0 2rpx 8rpx rgba(80, 50, 110, .35);
+}
+
+/* 玻璃拟态卡片（小程序不支持 backdrop-filter，用半透明白+描边模拟） */
+.glass {
+  background: var(--glass-strong);
+  border: 1rpx solid var(--glass-border);
+  border-radius: 28rpx;
+  box-shadow: 0 8rpx 30rpx rgba(80, 50, 110, .18);
+}
+
+/* 通用文字色 */
+.t-ink { color: var(--ink); }
+.t-soft { color: var(--ink-soft); }
+.t-light { color: var(--text-light); }
+
+/* 数字字体（Quicksand 不可用时回退无衬线） */
+.num-font { font-family: 'Quicksand', 'DIN Alternate', sans-serif; }
+
+/* 列表/滚动去滚动条 */
+.hide-scrollbar { scrollbar-width: none; }
+.hide-scrollbar::-webkit-scrollbar { display: none; width: 0; height: 0; }

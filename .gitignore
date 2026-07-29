@@ -1,0 +1,6 @@
+# 切勿提交：含 AppSecret 的账号文件
+账号信息.txt
+
+# 依赖与构建产物
+node_modules/
+miniprogram_npm/

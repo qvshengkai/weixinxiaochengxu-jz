@@ -1,0 +1,39 @@
+{
+  "pages": [
+    "pages/record/record",
+    "pages/stats/stats",
+    "pages/bill/bill",
+    "pages/me/me",
+    "pages/category-manage/category-manage"
+  ],
+  "window": {
+    "navigationStyle": "custom",
+    "navigationBarTitleText": "记账花哪去了",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#6E5AA8"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#8577A0",
+    "selectedColor": "#E4789F",
+    "backgroundColor": "#ffffff",
+    "list": [
+      { "pagePath": "pages/record/record", "text": "首页" },
+      { "pagePath": "pages/stats/stats", "text": "统计" },
+      { "pagePath": "pages/bill/bill", "text": "账单" },
+      { "pagePath": "pages/me/me", "text": "我的" }
+    ]
+  },
+  "permission": {
+    "scope.writePhotosAlbum": {
+      "desc": "用于保存账单分享图片到相册"
+    }
+  },
+  "requiredPrivateInfos": [],
+  "plugins": {
+    "WechatSI": { "version": "latest", "provider": "wx069ba97219f66d99" }
+  },
+  "__usePrivacyCheck__": true,
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

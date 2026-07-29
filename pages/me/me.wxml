@@ -1,0 +1,52 @@
+<star-bg />
+<privacy-modal />
+<view class="page">
+  <view class="wx-nav" style="padding-top:{{statusBarH}}px">
+    <text class="nav-title">花哪去了</text>
+  </view>
+
+  <view class="me-head">
+    <view class="me-card glass">
+      <view class="avatar">🌙</view>
+      <view class="me-info">
+        <view class="nick">小星 · {{nick}}</view>
+        <view class="streak">🌟 已连续记账 <b class="num-font">{{streak}}</b> 天，攒下第一枚"盈月"勋章</view>
+      </view>
+      <view class="me-arrow">›</view>
+    </view>
+    <view class="me-stats glass">
+      <view class="me-stat"><view class="v num-font">{{totalCount}}</view><view class="l">累计记账</view></view>
+      <view class="me-stat"><view class="v num-font">¥{{budget || '0'}}</view><view class="l">本月预算</view></view>
+      <view class="me-stat"><view class="v num-font">{{customCat}}</view><view class="l">分类数量</view></view>
+    </view>
+  </view>
+
+  <scroll-view class="me-body hide-scrollbar" scroll-y>
+    <view class="me-group-title">账本设置</view>
+    <view class="me-list glass">
+      <view class="me-item" bindtap="setBudget"><view class="mic">✨</view><view class="mtxt">预算管理<view class="msub">设置月度预算与超支提醒线</view></view><view class="mchev">›</view></view>
+      <view class="me-item" bindtap="goCategoryManage"><view class="mic">🏷️</view><view class="mtxt">分类管理<view class="msub">编辑分类图标与识别关键词</view></view><view class="mchev">›</view></view>
+      <view class="me-item" bindtap="goImport"><view class="mic">📥</view><view class="mtxt">导入记录<view class="msub">查看历史导入批次与去重结果</view></view><view class="mchev">›</view></view>
+    </view>
+
+    <view class="me-group-title">通知与提醒</view>
+    <view class="me-list glass">
+      <view class="me-item" bindtap="toggleBudgetWarn"><view class="mic">🔔</view><view class="mtxt">预算超支提醒<view class="msub">微信订阅消息推送</view></view><view class="toggle {{budgetWarnOn?'on':''}}"></view></view>
+      <view class="me-item" bindtap="toggleVoicePlugin"><view class="mic">🎤</view><view class="mtxt">语音记账插件<view class="msub">同声传译插件</view></view><view class="toggle {{voicePluginOn?'on':''}}"></view></view>
+    </view>
+
+    <view class="me-group-title">即将上线 · 二期</view>
+    <view class="me-list glass">
+      <view class="me-item locked" bindtap="comingSoon"><view class="mic">🩵</view><view class="mtxt">AI 省钱计划<view class="msub">按消费结构生成可执行建议</view></view><view class="lock-badge">敬请期待</view></view>
+      <view class="me-item locked" bindtap="comingSoon"><view class="mic">👯</view><view class="mtxt">家庭账本<view class="msub">邀请家人共同记账</view></view><view class="lock-badge">敬请期待</view></view>
+      <view class="me-item locked" bindtap="comingSoon"><view class="mic">🖼️</view><view class="mtxt">分享月度账单</view><view class="lock-badge">敬请期待</view></view>
+    </view>
+
+    <view class="me-group-title">其他</view>
+    <view class="me-list glass">
+      <view class="me-item" bindtap="privacy"><view class="mic">🔒</view><view class="mtxt">隐私与数据说明<view class="msub">不自动同步微信支付账单</view></view><view class="mchev">›</view></view>
+      <view class="me-item" bindtap="feedback"><view class="mic">💬</view><view class="mtxt">意见反馈</view><view class="mchev">›</view></view>
+      <view class="me-item" bindtap="about"><view class="mic">ℹ️</view><view class="mtxt">关于花哪去了<view class="msub">v1.0</view></view><view class="mchev">›</view></view>
+    </view>
+  </scroll-view>
+</view>

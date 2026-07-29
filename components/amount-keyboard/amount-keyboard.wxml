@@ -1,0 +1,14 @@
+<view class="kbd">
+  <view class="key" bindtap="onTap" data-k="1">1</view>
+  <view class="key" bindtap="onTap" data-k="2">2</view>
+  <view class="key" bindtap="onTap" data-k="3">3</view>
+  <view class="key" bindtap="onTap" data-k="4">4</view>
+  <view class="key" bindtap="onTap" data-k="5">5</view>
+  <view class="key" bindtap="onTap" data-k="6">6</view>
+  <view class="key" bindtap="onTap" data-k="7">7</view>
+  <view class="key" bindtap="onTap" data-k="8">8</view>
+  <view class="key" bindtap="onTap" data-k="9">9</view>
+  <view class="key" bindtap="onTap" data-k=".">.</view>
+  <view class="key" bindtap="onTap" data-k="0">0</view>
+  <view class="key fn" bindtap="onTap" data-k="del">⌫</view>
+</view>

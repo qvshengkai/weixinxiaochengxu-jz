@@ -1,0 +1,65 @@
+<star-bg />
+<privacy-modal />
+<view class="page">
+  <view class="wx-nav" style="padding-top:{{statusBarH}}px">
+    <text class="nav-back" bindtap="goBack">‹ 返回</text>
+    <text class="nav-title">分类管理</text>
+    <text class="nav-placeholder"></text>
+  </view>
+
+  <scroll-view class="cat-body hide-scrollbar" scroll-y>
+    <view class="cat-summary glass">
+      <view class="cat-count"><text class="num-font">{{customCount}}</text><text>个自定义分类</text></view>
+      <view class="cat-tip">系统默认分类不可删除；记账时分类会按你的使用频率自动排序</view>
+    </view>
+
+    <view class="cat-section-title">支出分类</view>
+    <view class="cat-list glass">
+      <view class="cat-item" wx:for="{{expenseCats}}" wx:key="id">
+        <view class="cat-icon">{{item.emoji}}</view>
+        <view class="cat-info">
+          <view class="cat-name">{{item.name}}</view>
+          <view class="cat-meta">{{item.isDefault?'系统默认':'自定义'}} · 用过 {{item.usageCount||0}} 次</view>
+        </view>
+        <view class="cat-del {{item.isDefault?'disabled':''}}" wx:if="{{!item.isDefault}}" data-id="{{item.id}}" bindtap="deleteCategory">删除</view>
+      </view>
+    </view>
+
+    <view class="cat-section-title">收入分类</view>
+    <view class="cat-list glass">
+      <view class="cat-item" wx:for="{{incomeCats}}" wx:key="id">
+        <view class="cat-icon">{{item.emoji}}</view>
+        <view class="cat-info">
+          <view class="cat-name">{{item.name}}</view>
+          <view class="cat-meta">{{item.isDefault?'系统默认':'自定义'}} · 用过 {{item.usageCount||0}} 次</view>
+        </view>
+        <view class="cat-del {{item.isDefault?'disabled':''}}" wx:if="{{!item.isDefault}}" data-id="{{item.id}}" bindtap="deleteCategory">删除</view>
+      </view>
+    </view>
+
+    <view class="cat-add-btn" bindtap="toggleAdd">＋ 新建分类</view>
+  </scroll-view>
+
+  <view class="add-mask {{showAdd?'show':''}}" bindtap="toggleAdd"></view>
+  <view class="add-sheet {{showAdd?'show':''}}">
+    <view class="sheet-head"><text bindtap="toggleAdd">取消</text><text class="sheet-title">新建分类</text><text class="sheet-save" bindtap="saveCategory">保存</text></view>
+    <view class="add-type">
+      <view class="type-opt {{newType==='expense'?'sel':''}}" data-type="expense" bindtap="onTypeChange">支出</view>
+      <view class="type-opt {{newType==='income'?'sel':''}}" data-type="income" bindtap="onTypeChange">收入</view>
+    </view>
+    <view class="add-field"><text>名称</text><input placeholder="如：零食、奶茶" value="{{newName}}" maxlength="6" bindinput="onNameInput" /></view>
+    <view class="add-field"><text>图标</text><view class="emoji-preview">{{newEmoji}}</view></view>
+    <view class="emoji-grid">
+      <view class="emoji-page">
+        <view class="emoji-item {{newEmoji===item?'sel':''}}" wx:for="{{paginatedEmojis}}" wx:key="*this" data-emoji="{{item}}" bindtap="selectEmoji">{{item}}</view>
+      </view>
+      <view class="emoji-pager">
+        <text bindtap="prevEmoji" class="{{emojiPage===0?'disabled':''}}">‹</text>
+        <text>{{emojiPage+1}} / {{totalEmojiPages}}</text>
+        <text bindtap="nextEmoji" class="{{emojiPage>=totalEmojiPages-1?'disabled':''}}">›</text>
+      </view>
+    </view>
+    <view class="add-field"><text>识别词</text><input placeholder="用逗号分隔，如：薯片,巧克力,坚果" value="{{newKeywords}}" bindinput="onKeywordsInput" /></view>
+    <view class="add-hint">语音记账或导入账单时，会按识别词自动匹配到这个分类</view>
+  </view>
+</view>

@@ -1,0 +1,4 @@
+<view class="star-bg">
+  <view class="starfield"></view>
+  <view class="glow"></view>
+</view>

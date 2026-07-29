@@ -1,0 +1,49 @@
+/* components/privacy-modal/privacy-modal.wxss */
+.privacy-mask {
+  position: fixed;
+  left: 0; right: 0; top: 0; bottom: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(28, 18, 48, .58);
+  padding: 80rpx 56rpx;
+  box-sizing: border-box;
+}
+.privacy-card {
+  width: 100%;
+  background: rgba(255, 255, 255, .94);
+  border-radius: 36rpx;
+  padding: 48rpx 40rpx 40rpx;
+  box-shadow: 0 24rpx 70rpx rgba(40, 20, 70, .4);
+}
+.p-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #3A2B5C;
+  text-align: center;
+  margin-bottom: 26rpx;
+}
+.p-body {
+  font-size: 26rpx;
+  line-height: 1.75;
+  color: #5A4A80;
+  margin-bottom: 40rpx;
+}
+.p-link {
+  color: #E4789F;
+  text-decoration: underline;
+}
+.p-agree {
+  width: 100%;
+  background: linear-gradient(135deg, #A78BDB, #E4789F);
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 600;
+  border-radius: 999rpx;
+  padding: 20rpx 0;
+  line-height: 1.4;
+}
+.p-agree::after {
+  border: none;
+}

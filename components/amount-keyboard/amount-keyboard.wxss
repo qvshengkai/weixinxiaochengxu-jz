@@ -1,0 +1,24 @@
+.kbd {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8rpx;
+}
+.key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 72rpx;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 600;
+  color: #5A4A80;
+  font-size: 38rpx;
+  background: #fff;
+  border-radius: 14rpx;
+  box-shadow: 0 3rpx 10rpx rgba(90, 67, 120, .1);
+}
+.key:active { background: #ece6f5; }
+.key.fn {
+  font-size: 24rpx;
+  color: #9A8CBB;
+}

@@ -1,0 +1,64 @@
+<star-bg />
+<privacy-modal />
+<view class="page stats-page">
+  <view class="wx-nav" style="padding-top:{{statusBarH}}px">
+    <text class="nav-title">花哪去了</text>
+  </view>
+
+  <!-- 顶部大数字 + 维度 -->
+  <view class="report-head">
+    <view class="rep-big">
+      <view class="lab">{{bigLabel}}</view>
+      <view class="num num-font">¥ {{expense}}</view>
+    </view>
+    <scroll-view class="dim-tabs hide-scrollbar" scroll-x enable-flex scroll-into-view="tab-{{active}}" scroll-with-animation>
+      <view
+        wx:for="{{dims}}"
+        wx:key="key"
+        id="tab-{{item.key}}"
+        class="dim-tab {{active===item.key?'sel':''}}"
+        data-k="{{item.key}}"
+        bindtap="onPeriod"
+      >{{item.label}}</view>
+    </scroll-view>
+  </view>
+
+  <!-- 左右滑动切换周期 -->
+  <swiper class="rep-swiper" current="{{activeIndex}}" bindchange="onSwipe" duration="280">
+    <swiper-item wx:for="{{dims}}" wx:key="key" class="rep-item">
+      <scroll-view class="rep-body hide-scrollbar" scroll-y>
+        <!-- 环比 / 同比 -->
+        <view class="compare-row">
+          <view class="cmp-card glass" wx:for="{{compare}}" wx:key="label">
+            <view class="t">{{item.label}}</view>
+            <view class="v num-font {{item.cls}}">{{item.val}}</view>
+          </view>
+        </view>
+
+        <!-- 消费占比 -->
+        <view class="panel glass">
+          <view class="panel-title">🌙 消费占比</view>
+          <view class="donut-row">
+            <view class="donut" style="background:{{donutGradient}}"></view>
+            <view class="legend">
+              <view class="leg-item" wx:for="{{breakdown}}" wx:key="name">
+                <view class="dot" style="background:{{item.color}}"></view>{{item.name}}<text class="num-font b-pct">{{item.pct}}%</text>
+              </view>
+              <view class="leg-item" wx:if="{{breakdown.length===0}}">
+                <view class="dot" style="background:#C7BEDD"></view>暂无支出
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 本月预算 -->
+        <view class="panel glass">
+          <view class="panel-title">✨ 本月预算 <text class="edit-link" bindtap="editBudget">设置</text></view>
+          <view class="budget-row">已用 ¥{{budgetUsed}} / ¥{{budget || '0'}}<b class="num-font">{{budgetPct}}%</b></view>
+          <view class="budget-track"><view class="budget-fill" style="width:{{budgetPct}}%"></view></view>
+          <view class="budget-warn" wx:if="{{budgetWarn}}">{{budgetWarn}}</view>
+        </view>
+      </scroll-view>
+    </swiper-item>
+  </swiper>
+</view>

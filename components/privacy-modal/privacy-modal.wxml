@@ -1,0 +1,13 @@
+<!-- components/privacy-modal/privacy-modal.wxml -->
+<view class="privacy-mask" wx:if="{{show}}" catchtap="noop">
+  <view class="privacy-card">
+    <view class="p-title">隐私保护提示</view>
+    <view class="p-body">
+      感谢使用《记账花哪去了》小程序。我们非常重视您的个人信息与数据安全。
+      在使用前，请阅读并同意
+      <text class="p-link" catchtap="openContract">{{privacyContractName}}</text>。
+      我们将依据指引收集必要的记账信息（如微信 openid、您录入的收支记录），并严格保密，绝不用于其他用途。
+    </view>
+    <button id="agree-btn" class="p-agree" open-type="agreePrivacyAuthorization" bindagreeprivacyauthorization="agree">同意并继续</button>
+  </view>
+</view>

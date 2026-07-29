@@ -1,0 +1,63 @@
+<star-bg />
+<privacy-modal />
+<view class="page record-page">
+  <view class="wx-nav" style="padding-top:{{statusBarH}}px">
+    <text class="nav-title">花哪去了</text>
+  </view>
+
+  <scroll-view class="home-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+    <view class="home-hero">
+      <text class="home-date">{{dateLabel}}</text>
+      <text class="home-label">今天支出</text>
+      <text class="home-amount num-font">¥ 0.00</text>
+      <text class="home-hint">还没有记录，记下第一笔吧</text>
+    </view>
+    <view class="home-empty">
+      <text class="empty-icon">✦</text>
+      <text>轻轻点一下底部，就能记下一笔</text>
+    </view>
+  </scroll-view>
+
+  <view class="entry-dock">
+    <view class="entry-trigger" bindtap="openEntry">＋　记一笔</view>
+    <button class="entry-voice" bindtap="startVoice" aria-label="语音记账">🎤</button>
+  </view>
+
+  <view class="voice-overlay" wx:if="{{recording}}" catchtap="stopVoice">
+    <view class="vo-wave"><view class="vo-bar"></view><view class="vo-bar"></view><view class="vo-bar"></view><view class="vo-bar"></view><view class="vo-bar"></view></view>
+    <view class="vo-mic">🎤</view>
+    <text class="vo-txt">正在聆听…点击停止</text>
+  </view>
+
+  <view class="entry-mask" wx:if="{{entryVisible}}" bindtap="closeEntry"></view>
+  <view class="entry-sheet {{entryVisible?'show':''}}">
+    <view class="sheet-head"><text bindtap="closeEntry">取消</text><text class="sheet-title">记一笔</text><text bindtap="closeEntry" class="sheet-close">×</text></view>
+    <view class="type-switch sheet-type">
+      <view class="opt {{type==='expense'?'sel':''}}" data-type="expense" bindtap="toggleType">支出</view>
+      <view class="opt {{type==='income'?'sel':''}}" data-type="income" bindtap="toggleType">收入</view>
+    </view>
+    <view class="sheet-amount"><text class="amount-label">金额</text><view><text class="amount-yuan">¥</text><text class="amount-number num-font">{{amountStr || '0.00'}}</text></view></view>
+
+    <view class="voice-panel sheet-voice" wx:if="{{voiceText}}">
+      <view class="voice-quote">“{{voiceText}}”</view>
+      <view class="voice-chips"><view class="vchip" wx:if="{{voiceChips.time}}">{{voiceChips.time}}</view><view class="vchip" wx:if="{{voiceChips.amount}}">¥ {{voiceChips.amount}}</view><view class="vchip" wx:if="{{voiceChips.category}}">{{voiceChips.category}}</view></view>
+    </view>
+
+    <view class="detail-list">
+      <view class="detail-row" bindtap="openCategoryPicker"><text>分类</text><view class="detail-value"><text>{{selectedCategory.emoji}}　{{selectedCategory.name}}</text><text>›</text></view></view>
+      <picker mode="date" value="{{dateText}}" bindchange="onDateChange"><view class="detail-row"><text>日期</text><view class="detail-value"><text>{{dateLabel}}</text><text>›</text></view></view></picker>
+      <view class="detail-row"><text>备注</text><input class="note-input" placeholder="添加备注" value="{{note}}" bindinput="onNote" /></view>
+    </view>
+    <view class="sheet-keyboard"><amount-keyboard bind:key="onKey" /></view>
+    <view class="sheet-actions"><button class="sheet-voice-btn" bindtap="startVoice" aria-label="语音输入">🎤</button><button class="sheet-save" bindtap="save">保存</button></view>
+  </view>
+
+  <view class="picker-backdrop" wx:if="{{categoryPickerVisible}}" bindtap="closeCategoryPicker"></view>
+  <view class="category-picker {{categoryPickerVisible?'show':''}}">
+    <view class="sheet-head"><text bindtap="closeCategoryPicker">‹ 返回</text><text class="sheet-title">选择分类</text><text></text></view>
+    <view class="picker-grid">
+      <view class="picker-item {{categoryId===item.id?'selected':''}}" wx:for="{{cats}}" wx:key="id" data-id="{{item.id}}" bindtap="selectCat"><view class="picker-icon">{{item.emoji}}</view><text>{{item.name}}</text></view>
+      <view class="picker-item picker-add" data-id="__add_category__" bindtap="selectCat"><view class="picker-icon">＋</view><text>添加分类</text></view>
+    </view>
+  </view>
+</view>

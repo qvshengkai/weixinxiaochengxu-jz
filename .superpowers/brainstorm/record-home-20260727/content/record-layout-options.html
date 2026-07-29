@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { background:#f6f4fb; color:#372c50; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; margin:0; padding:28px; }
+    h1 { margin:0 0 8px; font-size:26px; } .lead { margin:0 0 24px; color:#6e6482; }
+    .choices { display:grid; grid-template-columns:repeat(3,minmax(250px,1fr)); gap:18px; max-width:1280px; }
+    .choice { cursor:pointer; border:2px solid transparent; border-radius:22px; background:#fff; overflow:hidden; box-shadow:0 10px 30px rgba(67,46,104,.1); transition:.2s; }
+    .choice:hover,.choice.selected { border-color:#9d7ed2; transform:translateY(-2px); } .choice.selected { box-shadow:0 0 0 4px #e7def7; }
+    .phone { background:linear-gradient(160deg,#7d649d,#ad83b6); padding:12px 10px; min-height:525px; }
+    .screen { min-height:501px; padding:14px; border-radius:18px; background:linear-gradient(165deg,#7d649d 0%,#b691bd 52%,#f7edf1 52%); color:#fff; }
+    .nav { display:flex; justify-content:space-between; font-size:12px; opacity:.9; } .seg { margin:18px auto 8px; background:rgba(255,255,255,.2); padding:4px; border-radius:22px; display:flex; width:150px; font-size:12px; }
+    .seg span { flex:1; padding:6px; text-align:center; border-radius:18px; }.seg .on { background:#fff; color:#8a68a5; font-weight:700; }
+    .amount { font-size:43px; font-weight:750; text-align:center; padding:10px 0 14px; letter-spacing:-1px; }.muted { color:#eadff0; font-size:12px; }
+    .quick { display:flex; gap:7px; justify-content:center; margin-bottom:14px; }.pill { padding:6px 8px; background:rgba(255,255,255,.19); border-radius:14px; font-size:11px; }
+    .white { margin:0 -14px; padding:15px 14px; background:#fcfbfd; color:#4b3d5f; } .hint { font-size:11px; color:#998ca9; margin-bottom:8px; }
+    .cats { display:grid; grid-template-columns:repeat(4,1fr); gap:9px; }.cat { text-align:center; font-size:10px; color:#766886; }.ico { margin:auto auto 4px; width:36px;height:36px;border-radius:18px; display:flex;align-items:center;justify-content:center;background:#f4eff9;font-size:20px; }.cat.active .ico { background:#d996b7; box-shadow:0 0 0 3px #f5dce7; }.cat.active { color:#8f466d; font-weight:700; }
+    .keyboard { margin:12px -2px 0; display:grid; grid-template-columns:repeat(3,1fr); gap:5px; }.key { background:#fff; box-shadow:0 1px 4px rgba(60,40,90,.12); border-radius:8px; text-align:center; padding:10px 0; font-size:18px; color:#524363; }.key.f { font-size:12px;color:#887a96; }.save { background:#a36e9a;color:#fff;font-weight:700;font-size:13px; }
+    .fixed { margin:13px -14px -14px; padding:10px 14px; background:#fff; display:flex; gap:8px; }.more { color:#836f91; background:#f2edf5; border-radius:10px; padding:10px 12px; font-size:12px; }.primary { flex:1;border-radius:10px;padding:10px;background:#9c6b99;color:#fff;text-align:center;font-weight:700;font-size:13px; }
+    .sheetrow { border:1px solid #eee7f3;background:#fff;border-radius:12px;padding:11px;margin-top:9px; display:flex;justify-content:space-between;font-size:12px; }.voice { width:30px;height:30px;line-height:30px;text-align:center;border-radius:50%;background:#efe7f4; }
+    .meta { padding:16px 18px 18px; }.meta h2 { margin:0 0 8px;font-size:17px; }.meta p,.meta li { color:#6d607a;font-size:13px;line-height:1.55; }.badge { display:inline-block;background:#eee6f7;color:#75558e;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700; }
+    @media(max-width:900px){.choices{grid-template-columns:1fr;max-width:420px}.phone{min-height:0}.screen{min-height:470px}}
+  </style>
+</head>
+<body>
+  <h1>首页「记一笔」：哪种更像你常用的记账体验？</h1>
+  <p class="lead">共同原则：数字键盘只负责金额；日期、语音和保存不再挤进数字键位。点击一张卡片选择方案。</p>
+  <div class="choices">
+    <article class="choice" data-choice="category-first" onclick="choose(this)">
+      <div class="phone"><div class="screen"><div class="nav"><span>9:41</span><span>记一笔 · · ·</span></div><div class="seg"><span class="on">支出</span><span>收入</span></div><div class="amount"><small class="muted">金额</small><br>¥ 0.00</div><div class="quick"><span class="pill">今天 · 7月27日</span><span class="pill">🎤 语音</span></div><div class="white"><div class="hint">选择分类（先选，再输入金额）</div><div class="cats"><div class="cat active"><div class="ico">🍜</div>餐饮</div><div class="cat"><div class="ico">🛍️</div>购物</div><div class="cat"><div class="ico">🚇</div>交通</div><div class="cat"><div class="ico">☕</div>日用</div><div class="cat"><div class="ico">🏠</div>居住</div><div class="cat"><div class="ico">🎮</div>娱乐</div><div class="cat"><div class="ico">💊</div>医疗</div><div class="cat"><div class="ico">···</div>更多</div></div><div class="keyboard"><b class="key">1</b><b class="key">2</b><b class="key">3</b><b class="key">4</b><b class="key">5</b><b class="key">6</b><b class="key">7</b><b class="key">8</b><b class="key">9</b><b class="key f">.</b><b class="key">0</b><b class="key f">⌫</b></div></div><div class="fixed"><div class="more">备注</div><div class="primary">保存 ¥0.00</div></div></div></div>
+      <div class="meta"><span class="badge">推荐</span><h2>A · 分类优先</h2><p>最贴近主流记账 App：分类在上，底部纯数字键盘，保存独立固定。</p></div>
+    </article>
+    <article class="choice" data-choice="amount-first" onclick="choose(this)">
+      <div class="phone"><div class="screen"><div class="nav"><span>9:41</span><span>记一笔 · · ·</span></div><div class="seg"><span class="on">支出</span><span>收入</span></div><div class="amount"><small class="muted">金额</small><br>¥ 0.00</div><div class="quick"><span class="pill">今天 · 7月27日</span><span class="voice">🎤</span></div><div class="white"><div class="hint">金额优先，其他信息按需补充</div><div class="sheetrow"><span>🍜 餐饮</span><span>更换 ›</span></div><div class="sheetrow"><span>备注（可选）</span><span>＋</span></div><div class="keyboard"><b class="key">1</b><b class="key">2</b><b class="key">3</b><b class="key">4</b><b class="key">5</b><b class="key">6</b><b class="key">7</b><b class="key">8</b><b class="key">9</b><b class="key f">.</b><b class="key">0</b><b class="key f">⌫</b></div></div><div class="fixed"><div class="more">分类</div><div class="primary">保存 ¥0.00</div></div></div></div>
+      <div class="meta"><h2>B · 金额优先</h2><p>适合高频、单手记账；默认上次分类，点击“分类”后再打开选择面板。</p></div>
+    </article>
+    <article class="choice" data-choice="step-by-step" onclick="choose(this)">
+      <div class="phone"><div class="screen"><div class="nav"><span>9:41</span><span>记一笔 · · ·</span></div><div class="seg"><span class="on">支出</span><span>收入</span></div><div class="amount"><small class="muted">第 2 步 · 输入金额</small><br>¥ 0.00</div><div class="quick"><span class="pill">🍜 餐饮（已选）</span><span class="pill">今天</span></div><div class="white"><div class="hint">每一步只做一件事</div><div class="keyboard"><b class="key">1</b><b class="key">2</b><b class="key">3</b><b class="key">4</b><b class="key">5</b><b class="key">6</b><b class="key">7</b><b class="key">8</b><b class="key">9</b><b class="key f">.</b><b class="key">0</b><b class="key f">⌫</b></div><div class="sheetrow"><span>需要补充日期或备注？</span><span>展开 ›</span></div></div><div class="fixed"><div class="more">上一步</div><div class="primary">下一步</div></div></div></div>
+      <div class="meta"><h2>C · 分步引导</h2><p>最不容易误操作，但一次记账多一次跳转；更适合新手而非高频使用。</p></div>
+    </article>
+  </div>
+  <script>function choose(el){document.querySelectorAll('.choice').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');fetch('/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'click',choice:el.dataset.choice,text:el.querySelector('h2').textContent,timestamp:Date.now()})})}</script>
+</body>
+</html>

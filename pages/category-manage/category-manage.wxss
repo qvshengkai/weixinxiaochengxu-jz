@@ -1,0 +1,96 @@
+/* pages/category-manage/category-manage.wxss */
+.page { min-height: 100vh; display: flex; flex-direction: column; }
+
+.wx-nav {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28rpx 16rpx;
+  color: #4a3b5c;
+  font-weight: 700;
+}
+.nav-back { font-size: 28rpx; color: #8F466D; }
+.nav-title { font-size: 34rpx; }
+.nav-placeholder { width: 60rpx; }
+
+.cat-body { flex: 1; padding: 0 28rpx 40rpx; }
+.cat-summary {
+  margin: 16rpx 0 28rpx;
+  padding: 28rpx;
+  border-radius: 28rpx;
+}
+.cat-count { display: flex; align-items: baseline; gap: 12rpx; font-size: 30rpx; color: #4a3b5c; }
+.cat-count .num-font { font-size: 52rpx; font-weight: 700; color: #8F466D; }
+.cat-tip { margin-top: 14rpx; font-size: 22rpx; color: #9b8aa8; line-height: 1.5; }
+
+.cat-section-title { margin: 28rpx 0 14rpx 8rpx; font-size: 24rpx; color: #9b8aa8; }
+.cat-list { padding: 8rpx 24rpx; border-radius: 28rpx; }
+.cat-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid rgba(183, 156, 234, .15);
+}
+.cat-item:last-child { border-bottom: none; }
+.cat-icon { width: 72rpx; height: 72rpx; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #F4EDF8; font-size: 36rpx; }
+.cat-info { flex: 1; }
+.cat-name { font-size: 28rpx; color: #4a3b5c; font-weight: 600; }
+.cat-meta { margin-top: 4rpx; font-size: 22rpx; color: #9b8aa8; }
+.cat-del { padding: 10rpx 22rpx; border-radius: 26rpx; font-size: 24rpx; color: #fff; background: linear-gradient(135deg, #E4789F, #B79CEA); }
+.cat-del.disabled { background: #ddd; color: #999; }
+
+.cat-add-btn {
+  margin: 40rpx auto 60rpx;
+  width: 360rpx;
+  height: 84rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 42rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #E4789F, #B79CEA);
+  box-shadow: 0 12rpx 30rpx rgba(228, 120, 159, .35);
+}
+
+.add-mask { position: fixed; z-index: 70; inset: 0; background: rgba(38, 27, 54, .2); opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+.add-mask.show { opacity: 1; pointer-events: auto; }
+
+.add-sheet {
+  position: fixed;
+  z-index: 80;
+  left: 0; right: 0;
+  bottom: 0;
+  padding: 0 28rpx calc(28rpx + env(safe-area-inset-bottom));
+  border-radius: 34rpx 34rpx 0 0;
+  background: #fff;
+  transform: translateY(110%);
+  transition: transform .25s ease;
+}
+.add-sheet.show { transform: translateY(0); }
+
+.sheet-head { display: flex; align-items: center; justify-content: space-between; height: 96rpx; font-size: 28rpx; color: #756583; }
+.sheet-title { font-size: 32rpx; font-weight: 700; color: #4a3b5c; }
+.sheet-save { color: #E4789F; font-weight: 700; }
+
+.add-type { display: flex; gap: 20rpx; margin-bottom: 24rpx; }
+.type-opt { flex: 1; height: 76rpx; display: flex; align-items: center; justify-content: center; border-radius: 20rpx; font-size: 28rpx; color: #756583; background: #F4EDF8; }
+.type-opt.sel { color: #fff; background: linear-gradient(135deg, #E4789F, #B79CEA); }
+
+.add-field { display: flex; align-items: center; gap: 20rpx; padding: 22rpx 0; border-bottom: 1rpx solid rgba(183, 156, 234, .15); font-size: 28rpx; color: #4a3b5c; }
+.add-field text { width: 80rpx; color: #756583; }
+.add-field input { flex: 1; }
+.emoji-preview { width: 72rpx; height: 72rpx; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #F4EDF8; font-size: 38rpx; }
+
+.emoji-grid { margin: 16rpx 0; }
+.emoji-page { display: grid; grid-template-columns: repeat(7, 1fr); gap: 16rpx; justify-items: center; }
+.emoji-item { width: 68rpx; height: 68rpx; display: flex; align-items: center; justify-content: center; border-radius: 16rpx; font-size: 38rpx; background: #F8F4FB; }
+.emoji-item.sel { background: #F6E1EB; box-shadow: 0 0 0 4rpx #F9D6E4; }
+.emoji-pager { display: flex; align-items: center; justify-content: space-between; margin-top: 20rpx; padding: 0 12rpx; font-size: 26rpx; color: #756583; }
+.emoji-pager text.disabled { color: #ccc; }
+
+.add-hint { margin: 16rpx 0 10rpx; font-size: 22rpx; color: #9b8aa8; line-height: 1.5; }

@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "star-bg": "/components/star-bg/star-bg",
+    "amount-keyboard": "/components/amount-keyboard/amount-keyboard",
+    "privacy-modal": "/components/privacy-modal/privacy-modal"
+  },
+  "navigationStyle": "custom"
+}

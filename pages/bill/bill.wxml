@@ -1,0 +1,111 @@
+<star-bg />
+<privacy-modal />
+<view class="page">
+  <view class="wx-nav" style="padding-top:{{statusBarH}}px">
+    <text class="nav-title">花哪去了</text>
+  </view>
+
+  <view class="list-head">
+    <view class="list-toprow">
+      <text class="ttl2">账单</text>
+      <text class="manage-btn" bindtap="toggleManage">{{manageMode ? '完成' : '管理'}}</text>
+    </view>
+    <view class="import-btn" bindtap="onImport">📥 导入微信账单</view>
+
+    <view class="search-box" wx:if="{{searching}}">
+      <input class="search-input" placeholder="搜索备注或分类" value="{{searchKey}}" bindinput="onSearchInput" focus="{{searching}}" />
+    </view>
+
+    <scroll-view class="filter-row hide-scrollbar" scroll-x enable-flex wx:if="{{!searching}}">
+      <view
+        wx:for="{{filters}}"
+        wx:key="id"
+        class="filter-chip {{activeFilter===item.id?'sel':''}}"
+        data-id="{{item.id}}"
+        bindtap="onFilter"
+      >{{item.name}}</view>
+      <view class="filter-chip search" bindtap="toggleSearch">🔍</view>
+    </scroll-view>
+    <view class="filter-chip search-inline" wx:if="{{searching}}" bindtap="toggleSearch">✕ 取消</view>
+  </view>
+
+  <!-- 批量删除条 -->
+  <view class="batch-bar" wx:if="{{manageMode}}">
+    <text>已选 {{selectedIds.length}} 条</text>
+    <view class="batch-del" bindtap="batchDelete">删除所选</view>
+  </view>
+
+  <scroll-view class="list-body hide-scrollbar" scroll-y>
+    <view class="day-group" wx:for="{{groups}}" wx:key="day">
+      <view class="day-head">
+        <text>{{item.day}} · {{item.week}}</text>
+        <text class="wk">{{item.summary}}</text>
+      </view>
+      <view class="ledger-card glass">
+        <view
+          class="ledger-row {{manageMode?'selectable':''}}"
+          wx:for="{{item.rows}}"
+          wx:for-item="row"
+          wx:key="_id"
+          data-id="{{row._id}}"
+          bindtap="onRowTap"
+        >
+          <view class="chk" wx:if="{{manageMode && selectedIds.indexOf(row._id) >= 0}}">✓</view>
+          <view class="icon-badge" style="border-color:{{row.ring}}">{{row.emoji}}</view>
+          <view class="ledger-mid">
+            <view class="t1">{{row.note || row.name}}</view>
+            <view class="t2"><text class="src">{{row.source}}</text> · {{row.time}}</view>
+          </view>
+          <view class="ledger-right">
+            <text class="ledger-amt num-font {{row.isIncome ? 'pos' : 'neg'}}">{{row.amount}}</text>
+            <view class="row-actions" wx:if="{{!manageMode}}">
+              <text class="ra-btn" data-id="{{row._id}}" catchtap="openEdit">✎</text>
+              <text class="ra-btn" data-id="{{row._id}}" catchtap="onDelete">🗑</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{groups.length===0}}">
+      <view class="ic">🌙</view>
+      <view class="t">还没有账单，去记一笔或导入微信账单吧</view>
+    </view>
+  </scroll-view>
+
+  <!-- 编辑记录弹窗（修改金额 / 备注 / 类型） -->
+  <view class="edit-mask" wx:if="{{editVisible}}" bindtap="closeEdit">
+    <view class="edit-panel" catchtap="stopTap">
+      <view class="ep-head">
+        <text class="ep-title">编辑记录</text>
+        <text class="ep-close" bindtap="closeEdit">✕</text>
+      </view>
+
+      <view class="ep-type">
+        <view class="opt {{editType==='expense'?'sel':''}}" data-type="expense" bindtap="onEditType">支出</view>
+        <view class="opt {{editType==='income'?'sel':''}}" data-type="income" bindtap="onEditType">收入</view>
+      </view>
+
+      <view class="ep-amount">
+        <text class="cny">¥</text>
+        <input class="ep-amt-input num-font" type="digit" value="{{editAmount}}" bindinput="onEditAmount" placeholder="0.00" placeholder-class="ep-ph" />
+      </view>
+
+      <scroll-view class="ep-cat-scroll hide-scrollbar" scroll-y>
+        <view class="cat-grid">
+          <view class="cat-tile {{editCatId===item.id?'sel':''}}" wx:for="{{editCats}}" wx:key="id" data-id="{{item.id}}" bindtap="onPickEditCat">
+            <view class="box" style="border-color:{{item.ring}}">{{item.emoji}}</view>
+            <view class="lb">{{item.name}}</view>
+          </view>
+        </view>
+      </scroll-view>
+
+      <input class="ep-note" placeholder="🌸 备注（可选）" placeholder-class="ep-ph" value="{{editNote}}" bindinput="onEditNote" />
+
+      <view class="ep-actions">
+        <view class="ep-btn cancel" bindtap="closeEdit">取消</view>
+        <view class="ep-btn save" bindtap="saveEdit">保存</view>
+      </view>
+    </view>
+  </view>
+</view>
