@@ -1,24 +1,24 @@
 .kbd {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8rpx;
+  gap: 12rpx;
 }
 .key {
+  height: 78rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  height: 72rpx;
-  font-family: 'Quicksand', sans-serif;
-  font-weight: 600;
-  color: #5A4A80;
-  font-size: 38rpx;
+  border-radius: 18rpx;
   background: #fff;
-  border-radius: 14rpx;
-  box-shadow: 0 3rpx 10rpx rgba(90, 67, 120, .1);
+  box-shadow: 0 4rpx 12rpx rgba(96,69,123,.09);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+  font-size: 36rpx;
+  font-weight: 500;
+  color: #4a3b66;
 }
 .key:active { background: #ece6f5; }
 .key.fn {
-  font-size: 24rpx;
-  color: #9A8CBB;
+  font-size: 26rpx;
+  color: #9a8cbb;
 }

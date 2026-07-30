@@ -4,3 +4,6 @@
 # 依赖与构建产物
 node_modules/
 miniprogram_npm/
+
+# 切勿提交：含腾讯云 SecretId/SecretKey 的 ASR 配置
+cloudfunctions/asr/config.js

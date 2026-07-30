@@ -32,7 +32,7 @@
     <view class="me-group-title">通知与提醒</view>
     <view class="me-list glass">
       <view class="me-item" bindtap="toggleBudgetWarn"><view class="mic">🔔</view><view class="mtxt">预算超支提醒<view class="msub">微信订阅消息推送</view></view><view class="toggle {{budgetWarnOn?'on':''}}"></view></view>
-      <view class="me-item" bindtap="toggleVoicePlugin"><view class="mic">🎤</view><view class="mtxt">语音记账插件<view class="msub">同声传译插件</view></view><view class="toggle {{voicePluginOn?'on':''}}"></view></view>
+      <view class="me-item" bindtap="toggleVoicePlugin"><view class="mic">🎤</view><view class="mtxt">语音记账<view class="msub">原生录音 + 云端识别</view></view><view class="toggle {{voicePluginOn?'on':''}}"></view></view>
     </view>
 
     <view class="me-group-title">即将上线 · 二期</view>

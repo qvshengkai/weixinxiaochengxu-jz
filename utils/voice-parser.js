@@ -48,15 +48,25 @@ function parseChineseNumber(s) {
   return null;
 }
 
+// 把指定日期设为中午 12:00（用于"昨天/前天/X号"等用户没指定时刻的场景，
+// 比 00:00 更符合直觉，又不像 Date.now() 那样错位到现在）
+function noonOfDay(d) {
+  const x = startOfDay(d);
+  x.setHours(12, 0, 0, 0);
+  return x;
+}
+
 function parseDate(text) {
   const today = new Date();
-  if (/今天|今日/.test(text)) return startOfDay(today).getTime();
-  if (/大前天/.test(text)) return startOfDay(addDays(today, -3)).getTime();
-  if (/昨天|昨日/.test(text)) return startOfDay(addDays(today, -1)).getTime();
-  if (/前天/.test(text)) return startOfDay(addDays(today, -2)).getTime();
-  if (/大后天/.test(text)) return startOfDay(addDays(today, 3)).getTime();
-  if (/后天/.test(text)) return startOfDay(addDays(today, 2)).getTime();
-  if (/明天|明日/.test(text)) return startOfDay(addDays(today, 1)).getTime();
+  // 明确"现在/今天" → 当前时间（账单里会显示"刚才"那一秒）
+  if (/刚刚|刚才|现在|今天|今日/.test(text)) return today.getTime();
+  // 过去/未来某天 → 12:00 中点（避免 00:00 看起来像凌晨消费）
+  if (/大前天/.test(text)) return noonOfDay(addDays(today, -3)).getTime();
+  if (/昨天|昨日/.test(text)) return noonOfDay(addDays(today, -1)).getTime();
+  if (/前天/.test(text)) return noonOfDay(addDays(today, -2)).getTime();
+  if (/大后天/.test(text)) return noonOfDay(addDays(today, 3)).getTime();
+  if (/后天/.test(text)) return noonOfDay(addDays(today, 2)).getTime();
+  if (/明天|明日/.test(text)) return noonOfDay(addDays(today, 1)).getTime();
   if (/上周/.test(text)) {
     const lwd = text.match(/上周([一二三四五六日天])/);
     if (lwd) {
@@ -65,23 +75,23 @@ function parseDate(text) {
       const d = startOfDay(today);
       const day = d.getDay();
       const daysFromMon = day === 0 ? 6 : day - 1;
-      return startOfDay(addDays(d, -daysFromMon - 7 + (target - 1))).getTime();
+      return noonOfDay(addDays(d, -daysFromMon - 7 + (target - 1))).getTime();
     }
     const d = startOfDay(today);
     const day = d.getDay();
     const daysFromMon = day === 0 ? 6 : day - 1;
-    return startOfDay(addDays(d, -daysFromMon - 7)).getTime();
+    return noonOfDay(addDays(d, -daysFromMon - 7)).getTime();
   }
-  if (/本周|这周|这礼拜/.test(text)) return startOfDay(today).getTime();
+  if (/本周|这周|这礼拜/.test(text)) return today.getTime();
   if (/上月|上个月/.test(text)) {
-    const d = startOfDay(today);
+    const d = noonOfDay(today);
     d.setMonth(d.getMonth() - 1);
     return d.getTime();
   }
-  if (/本月|这个月/.test(text)) return startOfDay(today).getTime();
+  if (/本月|这个月/.test(text)) return today.getTime();
   const dayM = text.match(/(\d{1,2})\s*号/);
   if (dayM) {
-    const d = startOfDay(today);
+    const d = noonOfDay(today);
     d.setDate(parseInt(dayM[1], 10));
     if (d.getTime() > today.getTime()) d.setMonth(d.getMonth() - 1);
     return d.getTime();
@@ -94,9 +104,10 @@ function parseDate(text) {
     const day = d.getDay();
     let diff = target - day;
     if (diff > 0) diff -= 7;
-    return addDays(d, diff).getTime();
+    return noonOfDay(addDays(d, diff)).getTime();
   }
-  return startOfDay(today).getTime();
+  // fallback：用户没指定日期 → 当前时间
+  return today.getTime();
 }
 
 // 收支类型：收紧"发"字，避免"发现/出发/理发"误判为收入

@@ -103,13 +103,17 @@ Page({
     }
     wx.showLoading({ title: '保存中' });
     try {
-      await categoryService.addCategory({
+      const res = await categoryService.addCategory({
         name,
         emoji: this.data.newEmoji,
         type: this.data.newType,
         keywords: this.data.newKeywords
       });
       wx.hideLoading();
+      if (!res.success) {
+        wx.showModal({ title: '添加失败', content: res.error || '请重试', showCancel: false });
+        return;
+      }
       wx.showToast({ title: '已添加' });
       this.setData({
         showAdd: false,
@@ -138,13 +142,13 @@ Page({
     if (!res.confirm) return;
     wx.showLoading({ title: '删除中' });
     try {
-      const ok = await categoryService.deleteCategory(id);
+      const result = await categoryService.deleteCategory(id);
       wx.hideLoading();
-      if (ok) {
+      if (result.success) {
         wx.showToast({ title: '已删除' });
         this.loadCategories();
       } else {
-        wx.showToast({ title: '删除失败', icon: 'none' });
+        wx.showModal({ title: '删除失败', content: result.error || '请重试', showCancel: false });
       }
     } catch (e) {
       wx.hideLoading();

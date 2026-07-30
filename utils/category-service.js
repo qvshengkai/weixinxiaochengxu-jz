@@ -10,31 +10,38 @@ function generateId() {
   return 'uc_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
-// 首次将默认分类写入当前用户的云数据库，后续完全走云端
+// 检查集合不存在/权限等错误，用于降级判断
+function isMissingCollectionError(e) {
+  const msg = String(e && e.message || e);
+  return msg.includes('collection not exists') ||
+         msg.includes('Db or Table not exist') ||
+         msg.includes('-502005');
+}
+
+// 确保默认分类齐全：按 id 去重、逐条补写。
+// 关键修复：云开发客户端 add 不支持传数组，旧逻辑 add([...]) 导致默认分类从未写入云端，
+// 一旦用户添加任意分类使 count>0，便再也不补默认分类。现改为每次启动检查缺失项并补写，
+// 不影响用户自定义分类（自定义 id 为 uc_ 前缀，不会与默认 id 冲突）。
 async function doEnsureUserCategories() {
-  const key = 'categories_init_v1';
-  if (wx.getStorageSync(key)) return;
   try {
-    const countRes = await db().collection('categories').count();
-    if (countRes.total > 0) {
-      wx.setStorageSync(key, true);
-      return;
+    const ids = DEFAULT_CATEGORIES.map(c => c.id);
+    const res = await db().collection('categories').where({ id: cmd().in(ids) }).get();
+    const existIds = new Set((res.data || []).map(d => d.id));
+    for (const c of DEFAULT_CATEGORIES) {
+      if (existIds.has(c.id)) continue;
+      await db().collection('categories').add({
+        data: {
+          ...c,
+          usageCount: 0,
+          lastUsedAt: 0,
+          isDefault: true,
+          createdAt: Date.now()
+        }
+      });
     }
-    const docs = DEFAULT_CATEGORIES.map(c => ({
-      ...c,
-      usageCount: 0,
-      lastUsedAt: 0,
-      isDefault: true,
-      createdAt: Date.now()
-    }));
-    const BATCH = 20;
-    for (let i = 0; i < docs.length; i += BATCH) {
-      await db().collection('categories').add({ data: docs.slice(i, i + BATCH) });
-    }
-    wx.setStorageSync(key, true);
   } catch (e) {
     console.error('ensureUserCategories failed', e);
-    // 初始化失败时不阻塞，页面可回退到默认分类
+    // 集合不存在/权限不足时静默，页面走本地兜底
   }
 }
 
@@ -49,7 +56,11 @@ function ensureUserCategories() {
 
 // 获取分类，按 usageCount 倒序、lastUsedAt 倒序排列（常用在前）
 async function getCategories(type) {
-  await ensureUserCategories();
+  try {
+    await ensureUserCategories();
+  } catch (e) {
+    console.error('ensureUserCategories failed', e);
+  }
   const where = {};
   if (type) where.type = type;
   try {
@@ -103,34 +114,50 @@ async function touchCategory(id) {
 }
 
 async function addCategory({ name, emoji, type, color, ring, keywords }) {
-  const kw = (keywords || '').split(/[,，]/).map(k => k.trim()).filter(Boolean);
-  const doc = {
-    id: generateId(),
-    name: (name || '').trim(),
-    emoji: emoji || '🏷️',
-    type: type === 'income' ? 'income' : 'expense',
-    color: color || '#8395a7',
-    ring: ring || '#C7BEDD',
-    keywords: kw,
-    usageCount: 0,
-    lastUsedAt: 0,
-    isDefault: false,
-    createdAt: Date.now()
-  };
-  await db().collection('categories').add({ data: doc });
-  return doc;
+  try {
+    const kw = (keywords || '').split(/[,，]/).map(k => k.trim()).filter(Boolean);
+    const doc = {
+      id: generateId(),
+      name: (name || '').trim(),
+      emoji: emoji || '🏷️',
+      type: type === 'income' ? 'income' : 'expense',
+      color: color || '#8395a7',
+      ring: ring || '#C7BEDD',
+      keywords: kw,
+      usageCount: 0,
+      lastUsedAt: 0,
+      isDefault: false,
+      createdAt: Date.now()
+    };
+    await db().collection('categories').add({ data: doc });
+    return { success: true, data: doc };
+  } catch (e) {
+    console.error('addCategory failed', e);
+    const isMissing = isMissingCollectionError(e);
+    return {
+      success: false,
+      error: isMissing
+        ? '云数据库 categories 集合不存在，请先创建集合并设置权限'
+        : '添加分类失败，请重试',
+      detail: e
+    };
+  }
 }
 
 async function deleteCategory(id) {
   try {
     const res = await db().collection('categories').where({ id }).get();
     const cat = res.data[0];
-    if (!cat || cat.isDefault) return false;
+    if (!cat || cat.isDefault) return { success: false, error: '默认分类不能删除' };
     await db().collection('categories').doc(cat._id).remove();
-    return true;
+    return { success: true };
   } catch (e) {
     console.error('deleteCategory failed', e);
-    return false;
+    const isMissing = isMissingCollectionError(e);
+    return {
+      success: false,
+      error: isMissing ? '云数据库 categories 集合不存在' : '删除失败，请重试'
+    };
   }
 }
 

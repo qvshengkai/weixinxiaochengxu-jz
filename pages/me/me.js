@@ -104,15 +104,7 @@ Page({
     const v = !this.data.voicePluginOn;
     wx.setStorageSync('voicePluginOn', v);
     this.setData({ voicePluginOn: v });
-    if (v) {
-      wx.showModal({
-        title: '启用语音记账',
-        content: '请先在「微信公众平台 → 设置 → 第三方设置 → 插件管理」中添加「微信同声传译」插件，即可用语音说一句话记账。',
-        showCancel: false
-      });
-    } else {
-      wx.showToast({ title: '已关闭语音记账', icon: 'none' });
-    }
+    wx.showToast({ title: v ? '已开启语音记账' : '已关闭语音记账', icon: 'none' });
   },
 
   comingSoon() { wx.showToast({ title: '敬请期待', icon: 'none' }); },

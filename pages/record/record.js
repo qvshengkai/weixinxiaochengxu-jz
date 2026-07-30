@@ -81,6 +81,16 @@ Page({
     await this.loadCategories();
   },
 
+  onHide() {
+    // 页面切走/锁屏时主动停录音，避免后台继续录
+    if (this.data.recording && this.recorderManager) {
+      const p = this.recorderManager.stop();
+      if (p && typeof p.catch === 'function') {
+        p.catch(() => { /* 切走时忽略隐私/停止错误 */ });
+      }
+    }
+  },
+
   applyEntryAction(action) {
     const next = transitionRecordEntry({
       entryVisible: this.data.entryVisible,
@@ -112,31 +122,61 @@ Page({
     this.applyEntryAction({ type: 'CLOSE_CATEGORY_PICKER' });
   },
 
-  // 微信同声传译插件（需在公众平台添加插件后才可用）
+  // 语音记账：小程序自带录音管理器（无需任何插件）+ 云函数 ASR
   initVoice() {
+    this.recorderManager = wx.getRecorderManager();
+    this.recorderManager.onStop = (res) => {
+      this.setData({ recording: false });
+      this.handleRecordStop(res);
+    };
+    this.recorderManager.onError = (err) => {
+      const msg = (err && (err.errMsg || err.message || '')) || '';
+      this.setData({ recording: false });
+      if (msg.indexOf('privacy') > -1 || msg.indexOf('隐私') > -1) {
+        this.handleRecorderPrivacyError(err);
+      } else {
+        console.error('recorder error', err);
+        wx.showToast({ title: '录音失败', icon: 'none' });
+      }
+    };
+  },
+
+  // 录音因"隐私协议未声明麦克风 scope"而失败时的友好兜底
+  handleRecorderPrivacyError(err) {
+    this.setData({ recording: false });
+    console.error('recorder privacy error', err);
+    wx.showModal({
+      title: '录音权限未声明',
+      content: '小程序隐私保护指引尚未声明「麦克风」权限。\n\n请到：微信公众平台 → 设置 → 用户隐私保护指引 → 勾选「麦克风 / 录音功能」并填写用途，重新提交审核（约 1 个工作日）。审核通过后即可使用语音记账。',
+      showCancel: false,
+      confirmText: '知道了'
+    });
+  },
+
+  // 录音结束 → 上传云存储 → 调 asr 云函数识别 → 预填
+  async handleRecordStop(res) {
+    const tempFilePath = res.tempFilePath;
+    if (!tempFilePath) {
+      wx.showToast({ title: '没听清，请重试', icon: 'none' });
+      return;
+    }
+    wx.showLoading({ title: '识别中…' });
     try {
-      const plugin = requirePlugin('WechatSI');
-      this.manager = plugin.getRecordRecognitionManager();
-      this.manager.onRecognize = (res) => {
-        const t = (res && res.result) || '';
-        if (t) this.setData({ voiceText: t });
-      };
-      this.manager.onStop = (res) => {
-        this.setData({ recording: false });
-        const text = (res && res.result) || '';
-        if (!text) {
-          wx.showToast({ title: '没听清，请重试', icon: 'none' });
-          return;
-        }
-        this.applyVoice(text);
-      };
-      this.manager.onError = (err) => {
-        this.setData({ recording: false });
-        console.error('voice error', err);
-        wx.showToast({ title: '识别失败', icon: 'none' });
-      };
+      const up = await wx.cloud.uploadFile({
+        cloudPath: `asr/${Date.now()}.pcm`,
+        filePath: tempFilePath
+      });
+      const r = await wx.cloud.callFunction({ name: 'asr', data: { fileID: up.fileID } });
+      wx.hideLoading();
+      if (r.result && r.result.success && r.result.text) {
+        this.applyVoice(r.result.text);
+      } else {
+        wx.showToast({ title: (r.result && r.result.error) || '识别失败', icon: 'none' });
+      }
     } catch (e) {
-      this.manager = null; // 未添加插件时降级
+      wx.hideLoading();
+      console.error(e);
+      wx.showToast({ title: '识别失败', icon: 'none' });
     }
   },
 
@@ -174,29 +214,46 @@ Page({
     if (wx.getStorageSync('voicePluginOn') === false) {
       wx.showModal({
         title: '语音未开启',
-        content: '请在「我的 → 语音记账插件」打开开关后使用。',
-        showCancel: false
-      });
-      return;
-    }
-    if (!this.manager) {
-      wx.showModal({
-        title: '未启用语音',
-        content: '请先在「微信公众平台 → 设置 → 第三方设置 → 插件管理」中添加「微信同声传译」插件。',
+        content: '请在「我的 → 语音记账」打开开关后使用。',
         showCancel: false
       });
       return;
     }
     if (this.data.recording) {
-      this.manager.stop();
-    } else {
-      this.setData({ recording: true, voiceText: '正在聆听…' });
-      this.manager.start({ duration: 60000, lang: 'zh_CN' });
+      const p = this.recorderManager.stop();
+      if (p && typeof p.catch === 'function') {
+        p.catch((err) => this.handleRecorderPrivacyError(err));
+      }
+      return;
+    }
+    // 录音开始时先收起所有 sheet，避免和录音遮罩互相挡
+    this.setData({
+      recording: true,
+      voiceText: '正在聆听…',
+      entryVisible: false,
+      categoryPickerVisible: false
+    });
+    try {
+      this.recorderManager.start({
+        duration: 60000,
+        sampleRate: 16000,
+        numberOfChannels: 1,
+        encodeBitRate: 48000,
+        format: 'pcm'
+      });
+    } catch (err) {
+      // start 同步抛错（如隐私 scope 未声明）兜底
+      this.handleRecorderPrivacyError(err);
     }
   },
 
   stopVoice() {
-    if (this.manager && this.data.recording) this.manager.stop();
+    if (this.recorderManager && this.data.recording) {
+      const p = this.recorderManager.stop();
+      if (p && typeof p.catch === 'function') {
+        p.catch((err) => this.handleRecorderPrivacyError(err));
+      }
+    }
   },
 
   // 语音识别文本 → 预填（只预填，不自动存）
@@ -281,7 +338,9 @@ Page({
   },
 
   reset() {
-    const today = startOfDay(new Date()).getTime();
+    // 默认"现在"——账单页需要显示真实时分。
+    // 用户主动改日期时（onDateChange）才会回到 00:00（合理）。
+    const now = Date.now();
     const expenseCats = this.data.allCats.filter(c => c.type === 'expense');
     const selected = expenseCats[0] || this.data.selectedCategory;
     this.setData({
@@ -290,9 +349,9 @@ Page({
       cats: expenseCats,
       categoryId: selected.id,
       selectedCategory: selected,
-      happenAt: today,
-      dateText: formatDate(today),
-      dateLabel: humanLabel(today),
+      happenAt: now,
+      dateText: formatDate(now),
+      dateLabel: humanLabel(now),
       note: '',
       voiceText: '',
       voiceChips: { time: '', amount: '', category: '' },
