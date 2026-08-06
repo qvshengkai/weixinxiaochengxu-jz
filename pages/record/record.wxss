@@ -96,35 +96,74 @@
   z-index: 20;
   left: 32rpx;
   right: 32rpx;
-  bottom: calc(106rpx + env(safe-area-inset-bottom));
-  display: flex;
-  gap: 20rpx;
-  align-items: center;
+  bottom: calc(72rpx + env(safe-area-inset-bottom));
 }
-.entry-trigger {
-  flex: 1;
-  height: 106rpx;
-  display: flex;
-  align-items: center;
-  padding: 0 40rpx;
-  border-radius: 54rpx;
-  background: #fff;
-  color: #998bac;
+.composer-dock {
+  padding: 18rpx;
+  border: 2rpx solid rgba(255,255,255,.78);
+  border-radius: 34rpx;
+  background: rgba(255,255,255,.94);
   box-shadow: 0 18rpx 48rpx rgba(100,69,123,.19);
-  font-size: 28rpx;
 }
-.entry-voice {
-  width: 106rpx;
-  height: 106rpx;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #8fb7ea, #b79cea);
+.composer-modes {
+  display: flex;
+  gap: 12rpx;
+  overflow: hidden;
+  margin-bottom: 14rpx;
+}
+.composer-mode {
+  flex: 1;
+  min-width: 0;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 40rpx;
+  border-radius: 28rpx;
+  color: #806b94;
+  background: #f6eff9;
+  font-size: 22rpx;
+  white-space: nowrap;
+}
+.composer-mode.active {
   color: #fff;
-  font-size: 42rpx;
-  box-shadow: 0 18rpx 40rpx rgba(121,80,169,.33);
+  background: linear-gradient(135deg, #b79cea, #f3a6c4);
+  box-shadow: 0 8rpx 18rpx rgba(177,125,183,.25);
+}
+.composer-hint { padding: 0 6rpx 12rpx; color: #816e97; font-size: 23rpx; }
+.composer-examples { display: flex; gap: 10rpx; overflow: hidden; padding-bottom: 14rpx; }
+.composer-example { flex: 0 0 auto; padding: 8rpx 16rpx; border-radius: 20rpx; color: #89699c; background: #f3e8f6; font-size: 21rpx; }
+.composer-row { display: flex; align-items: center; gap: 12rpx; }
+.composer-input {
+  flex: 1;
+  min-width: 0;
+  height: 76rpx;
+  padding: 0 24rpx;
+  border: 2rpx solid #eee4f2;
+  border-radius: 38rpx;
+  color: #4a3b66;
+  background: #fff;
+  font-size: 25rpx;
+}
+.composer-send {
+  flex: 0 0 104rpx;
+  height: 76rpx;
   margin: 0;
   padding: 0;
   border: 0;
-  line-height: 1;
+  border-radius: 38rpx;
+  color: #fff;
+  background: linear-gradient(135deg, #8fb7ea, #b79cea);
+  font-size: 24rpx;
+  line-height: 76rpx;
+}
+.composer-mic {
+  flex: 0 0 76rpx;
+  width: 76rpx;
+  height: 76rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8fb7ea, #b79cea);
+  box-shadow: 0 10rpx 24rpx rgba(121,80,169,.25);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -151,9 +190,11 @@
   z-index: 50;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: env(safe-area-inset-bottom);
   height: 1210rpx;
   padding: 0 34rpx 34rpx;
+  box-sizing: border-box;
+  overflow-y: auto;
   border-radius: 58rpx 58rpx 0 0;
   background: #fbf8fd;
   transform: translateY(105%);
@@ -250,6 +291,31 @@
 .detail-value { display: flex; align-items: center; gap: 14rpx; color: #806b94; }
 .note-input { flex: 1; margin-left: 28rpx; min-width: 0; text-align: right; font-size: 26rpx; color: #806b94; }
 
+.ai-entry {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  margin-top: 18rpx;
+  padding: 12rpx;
+  border: 2rpx solid #eee6f3;
+  border-radius: 24rpx;
+  background: rgba(255,255,255,.82);
+}
+.ai-input { flex: 1; min-width: 0; color: #4a3b66; font-size: 24rpx; }
+.ai-fill-btn {
+  width: 144rpx;
+  height: 58rpx;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 18rpx;
+  color: #fff;
+  background: linear-gradient(135deg, #8fb7ea, #b79cea);
+  font-size: 23rpx;
+  line-height: 58rpx;
+}
+.ai-fill-btn[disabled] { opacity: .48; }
+
 /* 键盘 & 操作按钮 */
 .sheet-keyboard { margin-top: 32rpx; }
 .sheet-actions {
@@ -296,7 +362,7 @@
   z-index: 60;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: env(safe-area-inset-bottom);
   min-height: 820rpx;
   padding: 0 36rpx 50rpx;
   border-radius: 58rpx 58rpx 0 0;

@@ -18,11 +18,25 @@
     </view>
   </scroll-view>
 
-  <view class="entry-dock">
-    <view class="entry-trigger" bindtap="openEntry">＋　记一笔</view>
-    <view class="entry-voice" bindtap="startVoice" aria-label="语音记账" role="button">
-      <view class="mic-cap"></view>
-      <view class="mic-arc"></view>
+  <view class="entry-dock composer-dock" wx:if="{{!entryVisible && !recording}}">
+    <view class="composer-modes">
+      <view class="composer-mode {{composerMode==='ai'?'active':''}}" data-mode="ai" bindtap="selectComposerMode">✨ AI 记账</view>
+      <view class="composer-mode {{composerMode==='manual'?'active':''}}" data-mode="manual" bindtap="selectComposerMode">✏️ 手动记账</view>
+      <view class="composer-mode {{composerMode==='import'?'active':''}}" data-mode="import" bindtap="selectComposerMode">⇩ 账单导入</view>
+    </view>
+    <view class="composer-hint" wx:if="{{composerMode==='ai' && !aiText}}">一句话告诉我这笔账，我来帮你填好</view>
+    <view class="composer-examples" wx:if="{{composerMode==='ai' && !aiText}}">
+      <view class="composer-example" data-text="午饭 32" bindtap="fillComposerExample">午饭 32</view>
+      <view class="composer-example" data-text="收红包 200" bindtap="fillComposerExample">收红包 200</view>
+      <view class="composer-example" data-text="昨天打车 50" bindtap="fillComposerExample">昨天打车 50</view>
+    </view>
+    <view class="composer-row">
+      <input class="composer-input" value="{{aiText}}" maxlength="200" placeholder="例如：昨天午饭 32 元" bindinput="onAiText" confirm-type="send" bindconfirm="fillFromAi" />
+      <button class="composer-send" wx:if="{{aiText}}" loading="{{aiLoading}}" disabled="{{aiLoading}}" bindtap="fillFromAi">识别</button>
+      <view class="composer-mic" bindtap="startVoice" aria-label="语音输入" role="button">
+        <view class="mic-cap"></view>
+        <view class="mic-arc"></view>
+      </view>
     </view>
   </view>
 
@@ -53,7 +67,7 @@
       <view class="detail-row"><text>备注</text><input class="note-input" placeholder="添加备注" value="{{note}}" bindinput="onNote" /></view>
     </view>
     <view class="sheet-keyboard"><amount-keyboard bind:key="onKey" /></view>
-    <view class="sheet-actions"><button class="sheet-voice-btn" bindtap="startVoice" aria-label="语音输入">🎤</button><button class="sheet-save" bindtap="save">保存</button></view>
+    <view class="sheet-actions"><button class="sheet-save" bindtap="save">保存</button></view>
   </view>
 
   <view class="picker-backdrop {{categoryPickerVisible?'show':''}}" wx:if="{{categoryPickerVisible}}" bindtap="closeCategoryPicker"></view>

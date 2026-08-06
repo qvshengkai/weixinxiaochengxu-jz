@@ -4,9 +4,14 @@ const { startOfDay, addDays } = require('./date');
 
 const CN_NUM = { '零': 0, '一': 1, '二': 2, '两': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9, '十': 10 };
 
-// 金额解析：优先带单位 → 最后一个裸数字 → 中文数字
+// 金额解析：口语「35块5」「20元5角」优先 → 带单位 → 最后一个裸数字 → 中文数字
 function parseAmount(text) {
   if (!text) return null;
+  // 口语小数：35块5 / 20元5角 / 12块3毛 → 35.5 / 20.5 / 12.3
+  const yuanJiao = text.match(/(\d+(?:\.\d+)?)\s*(块|元|块钱|元钱)\s*(\d)\s*(角|毛)?/);
+  if (yuanJiao) {
+    return parseFloat(yuanJiao[1]) + parseInt(yuanJiao[3], 10) / 10;
+  }
   const withUnit = text.match(/(\d+(?:\.\d+)?)\s*(块|元|块钱|元钱)/);
   if (withUnit) return parseFloat(withUnit[1]);
   const nums = text.match(/(\d+(?:\.\d+)?)/g);

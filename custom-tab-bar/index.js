@@ -1,6 +1,7 @@
 Component({
   data: {
     selected: 0,
+    hidden: false,
     list: [
       { pagePath: '/pages/record/record', text: '首页', icon: '🌙' },
       { pagePath: '/pages/stats/stats', text: '统计', icon: '✨' },

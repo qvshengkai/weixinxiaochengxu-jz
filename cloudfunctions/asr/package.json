@@ -1,0 +1,9 @@
+{
+  "name": "asr",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "ws": "^8.18.0",
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -1,6 +1,7 @@
 // pages/record/record.js
 const { DEFAULT_CATEGORIES, getCategory: getDefaultCategory } = require('../../utils/categories');
-const { parseVoice } = require('../../utils/voice-parser');
+const { createAiRecordPatch } = require('../../utils/ai-record-entry');
+const { getComposerAction, createVoiceTextPatch } = require('../../utils/record-composer');
 const { startOfDay, formatDate } = require('../../utils/date');
 const { createRecordEntryState, transitionRecordEntry } = require('../../utils/record-entry-state');
 const categoryService = require('../../utils/category-service');
@@ -34,6 +35,9 @@ Page({
     recording: false,
     voiceText: '',
     voiceChips: { time: '', amount: '', category: '' },
+    aiText: '',
+    aiLoading: false,
+    composerMode: 'ai',
     source: 'manual',
     dateVisible: false,
     ...createRecordEntryState(DEFAULT_CATEGORIES.find(c => c.type === 'expense').id)
@@ -76,19 +80,25 @@ Page({
 
   async onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().setData({ selected: 0 });
+      this.getTabBar().setData({ selected: 0, hidden: false });
     }
     await this.loadCategories();
   },
 
   onHide() {
-    // 页面切走/锁屏时主动停录音，避免后台继续录
+    // 页面切走/锁屏时主动停录音；统一走 doStopVoice，立即收起遮罩防卡死
+    this.setTabBarVisible(true);
     if (this.data.recording && this.recorderManager) {
       const p = this.recorderManager.stop();
       if (p && typeof p.catch === 'function') {
         p.catch(() => { /* 切走时忽略隐私/停止错误 */ });
       }
     }
+  },
+
+  setTabBarVisible(visible) {
+    const tabBar = typeof this.getTabBar === 'function' && this.getTabBar();
+    if (tabBar) tabBar.setData({ hidden: !visible });
   },
 
   applyEntryAction(action) {
@@ -104,10 +114,30 @@ Page({
       ...next,
       selectedCategory: selected
     });
+    this.setTabBarVisible(!next.entryVisible);
   },
 
   openEntry() {
     this.applyEntryAction({ type: 'OPEN_ENTRY' });
+  },
+
+  selectComposerMode(e) {
+    const action = getComposerAction(e.currentTarget.dataset.mode);
+    if (action.type === 'OPEN_ENTRY') {
+      this.setData({ composerMode: 'manual' });
+      this.openEntry();
+      return;
+    }
+    if (action.type === 'IMPORT_BILL') {
+      wx.setStorageSync('pendingBillImport', true);
+      wx.switchTab({ url: '/pages/bill/bill' });
+      return;
+    }
+    this.setData({ composerMode: action.mode });
+  },
+
+  fillComposerExample(e) {
+    this.setData({ aiText: e.currentTarget.dataset.text || '', composerMode: 'ai' });
   },
 
   closeEntry() {
@@ -141,8 +171,11 @@ Page({
     };
   },
 
-  // 录音因"隐私协议未声明麦克风 scope"而失败时的友好兜底
+  // 录音因"隐私协议未声明麦克风 scope"而失败时的友好兜底（带去重，避免连续弹多个）
   handleRecorderPrivacyError(err) {
+    const now = Date.now();
+    if (this._lastPrivacyTip && now - this._lastPrivacyTip < 3000) return;
+    this._lastPrivacyTip = now;
     this.setData({ recording: false });
     console.error('recorder privacy error', err);
     wx.showModal({
@@ -176,7 +209,13 @@ Page({
     } catch (e) {
       wx.hideLoading();
       console.error(e);
-      wx.showToast({ title: '识别失败', icon: 'none' });
+      // 透传真实错误：callFunction reject（云函数未部署）时给出明确提示
+      const msg = (e && e.message) || '';
+      if (/fail|not exist|not found|云函数/i.test(msg)) {
+        wx.showToast({ title: '语音服务未部署/不可用', icon: 'none' });
+      } else {
+        wx.showToast({ title: '识别失败，请重试', icon: 'none' });
+      }
     }
   },
 
@@ -210,6 +249,74 @@ Page({
     this.setData({ note: e.detail.value });
   },
 
+  onAiText(e) {
+    this.setData({ aiText: e.detail.value });
+  },
+
+  async fillFromAi() {
+    const text = this.data.aiText.trim();
+    if (!text || this.data.aiLoading) return;
+
+    this.setData({ aiLoading: true });
+    try {
+      const response = await wx.cloud.callFunction({
+        name: 'parse-agent',
+        data: { text, categories: this.data.allCats, now: Date.now() }
+      });
+      const result = response.result;
+      if (!result || result.code !== 0) throw new Error((result && result.message) || 'AI 填充失败');
+
+      const patch = createAiRecordPatch(result.data, this.data.allCats);
+      this.setData({
+        ...patch,
+        cats: this.data.allCats.filter(category => category.type === patch.type),
+        dateText: formatDate(patch.happenAt),
+        dateLabel: humanLabel(patch.happenAt),
+        aiLoading: false
+      });
+      this.openEntry();
+      wx.showToast({ title: '已智能填充，请确认', icon: 'none' });
+    } catch (error) {
+      console.error('AI fill failed', error);
+      this.setData({ aiLoading: false });
+      // 透传真实错误：区分"云函数未部署"与"已部署但调用失败"
+      const msg = (error && error.message) || 'AI 填充失败，请手动填写';
+      if (/fail|not exist|not found|云函数/i.test(msg)) {
+        wx.showToast({ title: 'AI 服务未部署/不可用', icon: 'none' });
+      } else {
+        wx.showToast({ title: msg.length > 20 ? msg.slice(0, 20) + '…' : msg, icon: 'none' });
+      }
+    }
+  },
+
+  // 统一的停止录音：先立即同步收起遮罩，再调用 stop。
+  // 关键：无论 stop 返回 Promise 还是纯回调、无论是否抛异常，遮罩都先关掉，杜绝卡死。
+  doStopVoice() {
+    if (!this.recorderManager) return;
+    if (this.data.recording) {
+      this.setData({ recording: false });
+    }
+    try {
+      const p = this.recorderManager.stop();
+      if (p && typeof p.then === 'function') {
+        p.then(() => {}).catch((err) => this.maybePrivacyError(err));
+      }
+    } catch (err) {
+      // stop 同步抛错（如麦克风 scope 未声明）兜底：遮罩已收起，仅提示
+      this.maybePrivacyError(err);
+    }
+  },
+
+  // 判断是否为隐私/权限类错误并提示（容错 stop 的同步/异步两种抛错方式）
+  maybePrivacyError(err) {
+    const msg = (err && (err.errMsg || err.message || '')) || '';
+    if (msg.indexOf('privacy') > -1 || msg.indexOf('隐私') > -1 || msg.indexOf('scope') > -1) {
+      this.handleRecorderPrivacyError(err);
+    } else {
+      console.error('stop voice failed', err);
+    }
+  },
+
   startVoice() {
     if (wx.getStorageSync('voicePluginOn') === false) {
       wx.showModal({
@@ -219,17 +326,14 @@ Page({
       });
       return;
     }
+    // 录音中再次点击 → 停止（底部的圆形话筒和遮罩里的话筒都会走到这里）
     if (this.data.recording) {
-      const p = this.recorderManager.stop();
-      if (p && typeof p.catch === 'function') {
-        p.catch((err) => this.handleRecorderPrivacyError(err));
-      }
+      this.doStopVoice();
       return;
     }
     // 录音开始时先收起所有 sheet，避免和录音遮罩互相挡
     this.setData({
       recording: true,
-      voiceText: '正在聆听…',
       entryVisible: false,
       categoryPickerVisible: false
     });
@@ -248,42 +352,13 @@ Page({
   },
 
   stopVoice() {
-    if (this.recorderManager && this.data.recording) {
-      const p = this.recorderManager.stop();
-      if (p && typeof p.catch === 'function') {
-        p.catch((err) => this.handleRecorderPrivacyError(err));
-      }
-    }
+    this.doStopVoice();
   },
 
-  // 语音识别文本 → 预填（只预填，不自动存）
+  // 语音识别文本 → 回填 AI 输入框（只预填，不自动识别或保存）
   applyVoice(text) {
-    const p = parseVoice(text, this.data.allCats);
-    const cat = this.data.allCats.find(c => c.id === p.categoryId) ||
-                getDefaultCategory(p.categoryId);
-    this.setData({
-      voiceText: text,
-      amountStr: p.amount ? String(p.amount) : '',
-      type: p.type,
-      cats: (p.type === 'income'
-        ? this.data.allCats.filter(c => c.type === 'income')
-        : this.data.allCats.filter(c => c.type === 'expense')),
-      categoryId: p.categoryId,
-      selectedCategory: cat,
-      happenAt: p.happenAt,
-      dateText: formatDate(p.happenAt),
-      dateLabel: humanLabel(p.happenAt),
-      note: p.note || '',
-      source: 'voice',
-      entryVisible: true,
-      categoryPickerVisible: false,
-      voiceChips: {
-        time: humanLabel(p.happenAt),
-        amount: p.amount ? String(p.amount) : '',
-        category: cat ? cat.name : ''
-      }
-    });
-    wx.showToast({ title: '已智能填充，请确认', icon: 'none' });
+    this.setData(createVoiceTextPatch(text));
+    wx.showToast({ title: '已转成文字，请点击识别', icon: 'none' });
   },
 
   clearVoice() {
@@ -358,5 +433,6 @@ Page({
       source: 'manual',
       ...createRecordEntryState(selected.id)
     });
+    this.setTabBarVisible(true);
   }
 });

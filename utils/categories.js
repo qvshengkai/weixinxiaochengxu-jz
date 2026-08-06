@@ -22,17 +22,24 @@ const INCOME_CATS = DEFAULT_CATEGORIES.filter(c => c.type === 'income');
 const EXPENSE_CATS = DEFAULT_CATEGORIES.filter(c => c.type === 'expense');
 
 // 根据文本匹配分类（用于语音/导入）
-// list 可由 category-service.getCategories() 提供，未提供则回退到默认分类
+// list 可由 category-service.getCategories() 提供，未提供则回退到默认分类。
+// 评分：自定义分类优先；命中的关键词越长越具体得分越高，避免"奶茶"被默认餐饮抢走。
 function matchCategory(text, list) {
   if (!text) return null;
   const source = list || DEFAULT_CATEGORIES;
   const t = text.toLowerCase();
+  let best = null, bestScore = -1;
   for (const c of source) {
     for (const k of (c.keywords || [])) {
-      if (t.includes(k.toLowerCase())) return c;
+      const kl = k.toLowerCase();
+      if (t.includes(kl)) {
+        const isCustom = c.id && c.id.indexOf('uc_') === 0;
+        const score = (isCustom ? 1000 : 0) + kl.length;
+        if (score > bestScore) { bestScore = score; best = c; }
+      }
     }
   }
-  return null;
+  return best;
 }
 
 // 按 id 取分类

@@ -54,6 +54,10 @@ Page({
     }
     await this.loadCategories();
     this.load();
+    if (wx.getStorageSync('pendingBillImport')) {
+      wx.removeStorageSync('pendingBillImport');
+      wx.nextTick(() => this.onImport());
+    }
   },
 
   onPullDownRefresh() { this.load(() => wx.stopPullDownRefresh()); },
