@@ -24,11 +24,6 @@
       { "pagePath": "pages/me/me", "text": "我的" }
     ]
   },
-  "permission": {
-    "scope.writePhotosAlbum": {
-      "desc": "用于保存账单分享图片到相册"
-    }
-  },
   "requiredPrivateInfos": [],
   "plugins": {},
   "__usePrivacyCheck__": true,

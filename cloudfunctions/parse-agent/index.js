@@ -1,10 +1,10 @@
 const cloud = require('wx-server-sdk');
-const { validateSuggestion } = require('./deepseek-client');
 const {
-  buildSenseNovaRequest,
-  parseSenseNovaResponse,
-  requestSenseNova
-} = require('./sensenova-client');
+  buildChatRequest,
+  parseModelContent,
+  validateSuggestion,
+  requestDeepSeek
+} = require('./deepseek-client');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
@@ -29,24 +29,35 @@ function safeParseJson(content) {
   return value;
 }
 
+// 从 DeepSeek 响应中提取 choices[0].message.content
+function extractContent(response) {
+  const content = response && response.choices &&
+    response.choices[0] && response.choices[0].message &&
+    response.choices[0].message.content;
+  if (typeof content !== 'string' || !content.trim()) {
+    throw new Error('DeepSeek response is empty');
+  }
+  return content;
+}
+
 exports.main = async (event) => {
   const text = typeof event.text === 'string' ? event.text.trim() : '';
   const categories = Array.isArray(event.categories) ? event.categories : [];
   const now = Number(event.now) || Date.now();
-  const apiKey = process.env.SENSENOVA_API_KEY;
+  const apiKey = process.env.DEEPSEEK_API_KEY;
 
   if (!text || text.length > MAX_TEXT_LENGTH) return { code: 400, message: '请输入不超过 200 字的记账描述' };
   if (!categories.length) return { code: 400, message: '没有可用分类' };
   if (!apiKey) return { code: 500, message: 'AI 服务尚未配置' };
 
   try {
-    const response = await requestSenseNova(apiKey, buildSenseNovaRequest({
-      model: process.env.SENSENOVA_MODEL || DEFAULT_MODEL,
+    const response = await requestDeepSeek(apiKey, buildChatRequest({
+      model: process.env.DEEPSEEK_MODEL || DEFAULT_MODEL,
       text,
       now,
       categories
     }));
-    const content = parseSenseNovaResponse(response);
+    const content = extractContent(response);
     const suggestion = safeParseJson(content);
     return { code: 0, data: validateSuggestion(suggestion, categories) };
   } catch (error) {

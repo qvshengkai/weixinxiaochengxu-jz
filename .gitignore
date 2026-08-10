@@ -7,3 +7,9 @@ miniprogram_npm/
 
 # 切勿提交：含腾讯云 SecretId/SecretKey 的 ASR 配置
 cloudfunctions/asr/config.js
+
+# 临时文件（测试截图/脚本）
+.tmp_*
+
+# 本地调试截图
+.screenshots/
