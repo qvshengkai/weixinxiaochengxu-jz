@@ -4,7 +4,9 @@
     "pages/stats/stats",
     "pages/bill/bill",
     "pages/me/me",
-    "pages/category-manage/category-manage"
+    "pages/category-manage/category-manage",
+    "pages/ledger-list/ledger-list",
+    "pages/ledger-detail/ledger-detail"
   ],
   "window": {
     "navigationStyle": "custom",

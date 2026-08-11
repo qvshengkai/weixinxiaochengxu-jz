@@ -5,6 +5,14 @@
     <text class="nav-title">花哪去了</text>
   </view>
 
+  <!-- 统计范围切换：个人 / 共享账本 -->
+  <view class="stats-ledger-bar">
+    <scroll-view class="stats-ledger-scroll hide-scrollbar" scroll-x enable-flex>
+      <view class="slopt {{activeLedgerId===''?'sel':''}}" data-id="" bindtap="selectLedger">个人</view>
+      <view class="slopt {{activeLedgerId===item._id?'sel':''}}" wx:for="{{ledgerList}}" wx:key="_id" data-id="{{item._id}}" bindtap="selectLedger">{{item.name}}</view>
+    </scroll-view>
+  </view>
+
   <!-- 顶部大数字 + 维度 -->
   <view class="report-head">
     <view class="rep-big">

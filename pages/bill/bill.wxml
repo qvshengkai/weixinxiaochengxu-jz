@@ -5,10 +5,18 @@
     <text class="nav-title">花哪去了</text>
   </view>
 
+  <!-- 查看范围切换 -->
+  <view class="bill-ledger-bar">
+    <scroll-view class="bill-ledger-scroll hide-scrollbar" scroll-x enable-flex>
+      <view class="blopt {{activeLedgerId===''?'sel':''}}" data-id="" bindtap="selectLedger">个人</view>
+      <view class="blopt {{activeLedgerId===item._id?'sel':''}}" wx:for="{{ledgerList}}" wx:key="_id" data-id="{{item._id}}" bindtap="selectLedger">{{item.name}}</view>
+    </scroll-view>
+  </view>
+
   <view class="list-head">
     <view class="list-toprow">
-      <text class="ttl2">账单</text>
-      <text class="manage-btn" bindtap="toggleManage">{{manageMode ? '完成' : '管理'}}</text>
+      <text class="ttl2">账单{{viewOnly ? '（共享只读）' : ''}}</text>
+      <text class="manage-btn" wx:if="{{!viewOnly}}" bindtap="toggleManage">{{manageMode ? '完成' : '管理'}}</text>
     </view>
     <view class="import-btn" bindtap="onImport">📥 导入微信账单</view>
 

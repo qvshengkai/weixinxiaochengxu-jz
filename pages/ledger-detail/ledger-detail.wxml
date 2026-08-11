@@ -1,0 +1,48 @@
+<star-bg />
+<privacy-modal />
+<view class="page">
+  <view class="wx-nav" style="padding-top:{{statusBarH}}px">
+    <text class="nav-back" bindtap="goBack">‹ 返回</text>
+    <text class="nav-title">账本详情</text>
+    <text class="nav-share" bindtap="inviteFriend">邀请</text>
+  </view>
+
+  <scroll-view class="ld-body hide-scrollbar" scroll-y wx:if="{{ledger}}">
+    <view class="ld-hero glass">
+      <view class="ld-name">📒 {{ledger.name}}</view>
+      <view class="ld-meta">{{ledger.memberOpenids.length}} 位成员 · {{ledger.recordCount}} 笔记录</view>
+      <view class="ld-btns">
+        <button class="ld-btn primary" bindtap="goRecord">记一笔</button>
+        <button class="ld-btn ghost" bindtap="inviteFriend">邀请成员</button>
+      </view>
+    </view>
+
+    <view class="ld-section-title">成员（{{ledger.memberOpenids.length}}）</view>
+    <view class="ld-list glass">
+      <view class="ld-member" wx:for="{{ledger.memberOpenids}}" wx:key="*this">
+        <view class="ld-avatar">👤</view>
+        <view class="ld-mname">{{item === ledger.ownerOpenid ? '创建者' : '成员'}}</view>
+        <view class="ld-owner-badge" wx:if="{{item === ledger.ownerOpenid}}">👑</view>
+      </view>
+    </view>
+
+    <view class="ld-section-title">账本记录</view>
+    <view class="ld-list glass" wx:if="{{records.length}}">
+      <view class="ld-record" wx:for="{{records}}" wx:key="_id">
+        <view class="ld-reco-icon">{{item.type === 'expense' ? '💸' : '💰'}}</view>
+        <view class="ld-reco-info">
+          <view class="ld-reco-name">{{item.categoryName || '其他'}}</view>
+          <view class="ld-reco-note">{{item.note || '—'}} · {{item.source}}</view>
+        </view>
+        <view class="ld-reco-amount {{item.type === 'expense' ? 'expense' : 'income'}}">{{item.type === 'expense' ? '-' : '+'}}¥{{item.amount}}</view>
+      </view>
+    </view>
+    <view class="ld-empty glass" wx:else>
+      <view class="ld-empty-txt">暂无记录，点「记一笔」开始记账</view>
+    </view>
+
+    <view class="ld-leave" bindtap="leaveLedger">{{isOwner ? '解散账本' : '退出账本'}}</view>
+  </scroll-view>
+
+  <view class="ld-loading" wx:if="{{loading}}">加载中…</view>
+</view>

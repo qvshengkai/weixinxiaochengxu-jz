@@ -54,6 +54,14 @@
       <view class="opt {{type==='expense'?'sel':''}}" data-type="expense" bindtap="toggleType">支出</view>
       <view class="opt {{type==='income'?'sel':''}}" data-type="income" bindtap="toggleType">收入</view>
     </view>
+    <view class="ledger-switch">
+      <text class="ledger-label">记到</text>
+      <view class="ledger-options">
+        <view class="lopt {{activeLedgerId===''?'sel':''}}" data-id="" bindtap="selectLedger">个人</view>
+        <view class="lopt {{activeLedgerId===item._id?'sel':''}}" wx:for="{{ledgerList}}" wx:key="_id" data-id="{{item._id}}" bindtap="selectLedger">{{item.name}}</view>
+        <view class="lopt add" bindtap="goLedgerManage">＋</view>
+      </view>
+    </view>
     <view class="sheet-amount"><text class="amount-label">金额</text><view><text class="amount-yuan">¥</text><text class="amount-number num-font">{{amountStr || '0.00'}}</text></view></view>
 
     <view class="voice-panel sheet-voice" wx:if="{{voiceText}}">

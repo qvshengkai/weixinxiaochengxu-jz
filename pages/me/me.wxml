@@ -38,7 +38,7 @@
     <view class="me-group-title">即将上线 · 二期</view>
     <view class="me-list glass">
       <view class="me-item locked" bindtap="comingSoon"><view class="mic">🩵</view><view class="mtxt">AI 省钱计划<view class="msub">按消费结构生成可执行建议</view></view><view class="lock-badge">敬请期待</view></view>
-      <view class="me-item locked" bindtap="comingSoon"><view class="mic">👯</view><view class="mtxt">家庭账本<view class="msub">邀请家人共同记账</view></view><view class="lock-badge">敬请期待</view></view>
+      <view class="me-item" bindtap="goLedger"><view class="mic">👯</view><view class="mtxt">共享账本<view class="msub">家庭 / 出游，多人共同记账</view></view><view class="mchev">›</view></view>
       <view class="me-item locked" bindtap="comingSoon"><view class="mic">🖼️</view><view class="mtxt">分享月度账单</view><view class="lock-badge">敬请期待</view></view>
     </view>
 

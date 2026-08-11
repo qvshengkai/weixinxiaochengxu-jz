@@ -226,6 +226,22 @@ Page({
     this.setData({ type, cats, categoryId: selected.id, selectedCategory: selected });
   },
 
+  // 切换记账账本：个人 / 共享账本
+  selectLedger(e) {
+    const id = e.currentTarget.dataset.id || '';
+    const ledger = this.data.ledgerList.find(l => l._id === id) || null;
+    wx.setStorageSync('activeLedgerId', id);
+    this.setData({
+      activeLedgerId: id,
+      activeLedgerName: ledger ? ledger.name : ''
+    });
+    wx.showToast({ title: ledger ? `已切换到「${ledger.name}」` : '已切换到个人账本', icon: 'none' });
+  },
+
+  goLedgerManage() {
+    wx.navigateTo({ url: '/pages/ledger-list/ledger-list' });
+  },
+
   selectCat(e) {
     const id = e.currentTarget.dataset.id;
     if (id === '__add_category__') {
@@ -398,6 +414,7 @@ Page({
         happenAt: this.data.happenAt,
         note: this.data.note,
         source: this.data.source || 'manual',
+        ledgerId: this.data.activeLedgerId || '',
         createdAt: Date.now()
       }
     }).then(() => {

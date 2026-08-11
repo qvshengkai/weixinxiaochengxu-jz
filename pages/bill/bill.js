@@ -30,7 +30,11 @@ Page({
     editAmount: '',
     editNote: '',
     editCatId: '',
-    editCats: DEFAULT_CATEGORIES.filter(c => c.type === 'expense')
+    editCats: DEFAULT_CATEGORIES.filter(c => c.type === 'expense'),
+    ledgerList: [],
+    activeLedgerId: '',
+    activeLedgerName: '',
+    viewOnly: false
   },
 
   async onLoad() {
@@ -48,11 +52,42 @@ Page({
     });
   },
 
+  // 加载共享账本列表（切换查看范围）
+  async loadLedgerInfo() {
+    let ledgerList = [];
+    try {
+      const { call } = require('../../utils/cloud');
+      ledgerList = await call('ledger', { action: 'list' }) || [];
+    } catch (e) {
+      console.error('load ledger info failed', e);
+    }
+    const storageLedgerId = wx.getStorageSync('activeLedgerId') || '';
+    const active = ledgerList.find(l => l._id === storageLedgerId) || null;
+    this.setData({
+      ledgerList,
+      activeLedgerId: active ? active._id : '',
+      activeLedgerName: active ? active.name : ''
+    });
+  },
+
+  // 切换查看范围
+  selectLedger(e) {
+    const id = e.currentTarget.dataset.id || '';
+    const ledger = this.data.ledgerList.find(l => l._id === id) || null;
+    wx.setStorageSync('activeLedgerId', id);
+    this.setData({
+      activeLedgerId: id,
+      activeLedgerName: ledger ? ledger.name : ''
+    });
+    this.load();
+  },
+
   async onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 2 });
     }
     await this.loadCategories();
+    await this.loadLedgerInfo();
     this.load();
     if (wx.getStorageSync('pendingBillImport')) {
       wx.removeStorageSync('pendingBillImport');
@@ -64,11 +99,22 @@ Page({
 
   async load(done) {
     try {
-      const res = await db().collection('records')
-        .orderBy('happenAt', 'desc')
-        .limit(100)
-        .get();
-      this.all = res.data.map(r => {
+      let raw = [];
+      const ledgerId = this.data.activeLedgerId;
+      if (ledgerId) {
+        // 共享账本：走云函数读全体成员记录（仅查看，不可编辑删除）
+        const { call } = require('../../utils/cloud');
+        raw = (await call('ledger', { action: 'myRecords', ledgerId, limit: 100 })) || [];
+        this.setData({ viewOnly: true });
+      } else {
+        const res = await db().collection('records')
+          .orderBy('happenAt', 'desc')
+          .limit(100)
+          .get();
+        raw = res.data;
+        this.setData({ viewOnly: false });
+      }
+      this.all = raw.map(r => {
         const c = this.data.allCats.find(x => x.id === r.categoryId) || getDefaultCategory(r.categoryId);
         const amt = parseFloat(r.amount);
         return {

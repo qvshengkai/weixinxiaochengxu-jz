@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "star-bg": "/components/star-bg/star-bg",
+    "privacy-modal": "/components/privacy-modal/privacy-modal"
+  },
+  "navigationStyle": "custom"
+}

@@ -1,0 +1,48 @@
+<star-bg />
+<privacy-modal />
+<view class="page">
+  <view class="wx-nav" style="padding-top:{{statusBarH}}px">
+    <text class="nav-back" bindtap="goBack">‹ 返回</text>
+    <text class="nav-title">共享账本</text>
+    <text class="nav-placeholder"></text>
+  </view>
+
+  <scroll-view class="ledger-body hide-scrollbar" scroll-y>
+    <view class="ledger-summary glass">
+      <view class="ledger-sum-title">👨‍👩‍👧 共享账本</view>
+      <view class="ledger-sum-tip">和家人、朋友一起记账。创建账本后邀请成员，全员共享记录与统计。</view>
+    </view>
+
+    <view class="ledger-section-title">我的账本</view>
+    <view class="ledger-list glass" wx:if="{{!loading && ledgers.length}}">
+      <view class="ledger-item" wx:for="{{ledgers}}" wx:key="_id" data-id="{{item._id}}" bindtap="goDetail">
+        <view class="ledger-icon">📒</view>
+        <view class="ledger-info">
+          <view class="ledger-name">{{item.name}}</view>
+          <view class="ledger-meta">{{item.memberCount}} 位成员 · {{item.ownerOpenid ? '已创建' : ''}}</view>
+        </view>
+        <view class="ledger-chev">›</view>
+      </view>
+    </view>
+
+    <view class="ledger-empty glass" wx:if="{{!loading && !ledgers.length}}">
+      <view class="le-empty-icon">📭</view>
+      <view class="le-empty-txt">还没有共享账本</view>
+      <view class="le-empty-sub">创建一个账本，邀请家人朋友一起记账</view>
+    </view>
+
+    <view class="ledger-loading" wx:if="{{loading}}">加载中…</view>
+
+    <view class="ledger-add-btn" bindtap="toggleCreate">＋ 创建账本</view>
+    <view class="ledger-tip">一个账号只能加入一个账本；创建者退出即解散账本</view>
+  </scroll-view>
+
+  <view class="add-mask {{showCreate?'show':''}}" bindtap="toggleCreate"></view>
+  <view class="add-sheet {{showCreate?'show':''}}">
+    <view class="sheet-head"><text bindtap="toggleCreate">取消</text><text class="sheet-title">创建账本</text><text></text></view>
+    <view class="sheet-body">
+      <input class="create-input" placeholder="账本名称，如：我们家 / 8月海边游" value="{{createName}}" bindinput="onCreateName" maxlength="20" />
+      <button class="create-btn" loading="{{creating}}" disabled="{{creating}}" bindtap="submitCreate">创建</button>
+    </view>
+  </view>
+</view>

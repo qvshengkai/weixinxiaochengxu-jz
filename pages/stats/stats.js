@@ -45,7 +45,10 @@ Page({
     budgetUsed: '0.00',
     budgetPct: 0,
     budgetWarn: '',
-    allCats: []
+    allCats: [],
+    ledgerList: [],
+    activeLedgerId: '',
+    activeLedgerName: ''
   },
 
   async onLoad() {
@@ -60,6 +63,35 @@ Page({
     }
     this.setData({ budget: wx.getStorageSync('monthlyBudget') || 0 });
     await this.loadCategories();
+    await this.loadLedgerInfo();
+    this.refresh();
+  },
+
+  // 加载共享账本列表（统计切换用）
+  async loadLedgerInfo() {
+    let ledgerList = [];
+    try {
+      ledgerList = await call('ledger', { action: 'list' }) || [];
+    } catch (e) {
+      console.error('load ledger info failed', e);
+    }
+    const storageLedgerId = wx.getStorageSync('activeLedgerId') || '';
+    const active = ledgerList.find(l => l._id === storageLedgerId) || null;
+    this.setData({
+      ledgerList,
+      activeLedgerId: active ? active._id : '',
+      activeLedgerName: active ? active.name : ''
+    });
+  },
+
+  // 切换统计范围：个人 / 共享账本
+  selectLedger(e) {
+    const id = e.currentTarget.dataset.id || '';
+    const ledger = this.data.ledgerList.find(l => l._id === id) || null;
+    this.setData({
+      activeLedgerId: id,
+      activeLedgerName: ledger ? ledger.name : ''
+    });
     this.refresh();
   },
 
@@ -119,11 +151,12 @@ Page({
     const month = getCompare('thisMonth').current;
     wx.showLoading({ title: '统计中' });
     try {
+      const ledgerId = this.data.activeLedgerId || '';
       const [cur, pv, yy, monthAgg] = await Promise.all([
-        call('aggregate', current),
-        call('aggregate', prev),
-        yoy ? call('aggregate', yoy) : Promise.resolve(null),
-        call('aggregate', month)
+        call('aggregate', { ...current, ledgerId }),
+        call('aggregate', { ...prev, ledgerId }),
+        yoy ? call('aggregate', { ...yoy, ledgerId }) : Promise.resolve(null),
+        call('aggregate', { ...month, ledgerId })
       ]);
       this.render(cur, pv, yy, monthAgg);
     } catch (e) {

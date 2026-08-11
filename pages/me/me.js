@@ -94,6 +94,8 @@ Page({
 
   goCategoryManage() { wx.navigateTo({ url: '/pages/category-manage/category-manage' }); },
 
+  goLedger() { wx.navigateTo({ url: '/pages/ledger-list/ledger-list' }); },
+
   toggleBudgetWarn() {
     const v = !this.data.budgetWarnOn;
     wx.setStorageSync('budgetWarnOn', v);
