@@ -155,11 +155,11 @@ Page({
   // 语音记账：小程序自带录音管理器（无需任何插件）+ 云函数 ASR
   initVoice() {
     this.recorderManager = wx.getRecorderManager();
-    this.recorderManager.onStop = (res) => {
+    this.recorderManager.onStop((res) => {
       this.setData({ recording: false });
       this.handleRecordStop(res);
-    };
-    this.recorderManager.onError = (err) => {
+    });
+    this.recorderManager.onError((err) => {
       const msg = (err && (err.errMsg || err.message || '')) || '';
       this.setData({ recording: false });
       if (msg.indexOf('privacy') > -1 || msg.indexOf('隐私') > -1) {
@@ -168,7 +168,7 @@ Page({
         console.error('recorder error', err);
         wx.showToast({ title: '录音失败', icon: 'none' });
       }
-    };
+    });
   },
 
   // 录音因"隐私协议未声明麦克风 scope"而失败时的友好兜底（带去重，避免连续弹多个）
