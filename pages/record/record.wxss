@@ -64,7 +64,7 @@
 
 /* 空状态 */
 .home-empty {
-  margin: 120rpx 40rpx 0;
+  margin: 340rpx 40rpx 0;
   padding: 36rpx 32rpx;
   text-align: center;
   color: #4a3b66;
@@ -96,7 +96,7 @@
   z-index: 20;
   left: 32rpx;
   right: 32rpx;
-  bottom: calc(96rpx + env(safe-area-inset-bottom));
+  bottom: calc(140rpx + env(safe-area-inset-bottom));
 }
 .composer-dock {
   padding: 18rpx;

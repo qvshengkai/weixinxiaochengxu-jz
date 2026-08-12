@@ -8,7 +8,7 @@ const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'u
 
 test('home entry dock sits immediately above the custom tab bar', () => {
   const css = read('pages/record/record.wxss');
-  assert.match(css, /\.entry-dock\s*\{[\s\S]*?bottom:\s*calc\(96rpx \+ env\(safe-area-inset-bottom\)\)/);
+  assert.match(css, /\.entry-dock\s*\{[\s\S]*?bottom:\s*calc\(140rpx \+ env\(safe-area-inset-bottom\)\)/);
   assert.doesNotMatch(css, /\.entry-dock\s*\{[\s\S]*?bottom:\s*calc\(106rpx \+ env\(safe-area-inset-bottom\)\)/);
 });
 
