@@ -60,8 +60,10 @@ button.ld-btn {
   padding: 0;
   border: none;
   background: none;
-  line-height: normal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 button.nav-share::after,
 button.ld-btn::after { border: none; }
-.nav-share { font-size: 28rpx; color: #8F466D; font-weight: 700; }
+.nav-share { font-size: 28rpx; color: #8F466D; font-weight: 700; height: auto; line-height: 1; }
