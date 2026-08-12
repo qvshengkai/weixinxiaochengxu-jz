@@ -1,5 +1,9 @@
 /* pages/ledger-detail/ledger-detail.wxss */
-.page { min-height: 100vh; display: flex; flex-direction: column; }
+/* 全局 box-sizing 保护，防止 padding/border 撑破宽度 */
+view, button, scroll-view, text {
+  box-sizing: border-box;
+}
+.page { min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
 .wx-nav {
   position: relative; z-index: 10;
@@ -11,7 +15,14 @@
 .nav-title { font-size: 34rpx; }
 .nav-share { font-size: 28rpx; color: #8F466D; }
 
-.ld-body { flex: 1; padding: 0 28rpx 40rpx; }
+.ld-body {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  padding: 0 28rpx 40rpx;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
 .ld-hero { margin: 16rpx 0 28rpx; padding: 32rpx; border-radius: 28rpx; }
 .ld-name { font-size: 36rpx; color: #4a3b5c; font-weight: 700; }
 .ld-meta { margin-top: 10rpx; font-size: 22rpx; color: #9b8aa8; }
@@ -67,3 +78,40 @@ button.ld-btn {
 button.nav-share::after,
 button.ld-btn::after { border: none; }
 .nav-share { font-size: 28rpx; color: #8F466D; font-weight: 700; height: auto; line-height: 1; }
+
+/* 账本统计 */
+.ld-stats { padding: 28rpx 24rpx; border-radius: 28rpx; overflow: hidden; }
+.ld-stats-row { display: flex; }
+.ld-stat { flex: 1; min-width: 0; text-align: center; }
+.ld-stat-v { font-size: 32rpx; font-weight: 700; color: #4a3b5c; }
+.ld-stat-v.expense { color: #e06a6a; }
+.ld-stat-v.income { color: #4caf7d; }
+.ld-stat-l { margin-top: 6rpx; font-size: 20rpx; color: #9b8aa8; }
+
+.ld-stats-sub { margin: 24rpx 0 10rpx; font-size: 22rpx; color: #9b8aa8; }
+.ld-member-stat {
+  display: flex; align-items: center; gap: 14rpx;
+  padding: 14rpx 0; border-bottom: 1rpx solid rgba(183,156,234,.15);
+}
+.ld-member-stat:last-child { border-bottom: none; }
+.ld-mstat-avatar { width: 56rpx; height: 56rpx; border-radius: 50%; background: #F4EDF8; display: flex; align-items: center; justify-content: center; font-size: 28rpx; }
+.ld-mstat-info { flex: 1; }
+.ld-mstat-name { font-size: 24rpx; color: #4a3b5c; font-weight: 600; }
+.ld-mstat-count { font-size: 20rpx; color: #9b8aa8; }
+.ld-mstat-amount { font-size: 26rpx; font-weight: 700; color: #e06a6a; }
+.ld-stats-empty { padding: 20rpx 0; text-align: center; font-size: 22rpx; color: #9b8aa8; }
+
+/* 防溢出：长文本截断 */
+.ld-name, .ld-meta, .ld-mname, .ld-reco-name, .ld-reco-note {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ld-mstat-amount, .ld-reco-amount {
+  flex-shrink: 0;
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ld-mstat-info, .ld-reco-info { min-width: 0; }

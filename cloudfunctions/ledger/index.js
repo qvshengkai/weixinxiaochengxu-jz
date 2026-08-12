@@ -20,6 +20,7 @@ exports.main = async (event) => {
       case 'detail': return await ledgerDetail(event, OPENID);
       case 'myRecords': return await myRecords(event, OPENID);
       case 'memberCount': return await memberCount(event, OPENID);
+      case 'stats': return await ledgerStats(event, OPENID);
       default:
         return { code: 1, message: `unknown action: ${action}` };
     }
@@ -189,4 +190,66 @@ async function memberCount(event, OPENID) {
   const doc = await db.collection('ledgers').doc(ledgerId).get().catch(() => null);
   if (!doc || !doc.data) return { code: 1, message: '账本不存在' };
   return { code: 0, data: { count: (doc.data.memberOpenids || []).length } };
+}
+
+// 账本统计：分类聚合 + 成员贡献（按账本）
+async function ledgerStats(event, OPENID) {
+  const ledgerId = typeof event.ledgerId === 'string' ? event.ledgerId : '';
+  if (!ledgerId) return { code: 1, message: '缺少账本ID' };
+
+  const doc = await db.collection('ledgers').doc(ledgerId).get().catch(() => null);
+  if (!doc || !doc.data) return { code: 1, message: '账本不存在或已解散' };
+  if (!doc.data.memberOpenids.includes(OPENID)) return { code: 1, message: '你不是该账本成员' };
+
+  const start = Number(event.start) || 0;
+  const end = Number(event.end) || Date.now();
+  const $ = db.command.aggregate;
+
+  // 1) 分类聚合（全体成员）
+  const catAgg = await db.collection('records').aggregate()
+    .match({ ledgerId, happenAt: _.gte(start).lte(end) })
+    .group({
+      _id: { category: '$categoryId', type: '$type' },
+      total: $.sum('$amount'),
+      count: $.sum(1)
+    })
+    .end();
+  const catGroups = catAgg.list || catAgg.data || [];
+
+  // 2) 成员贡献（按 _openid 聚合支出）
+  const memAgg = await db.collection('records').aggregate()
+    .match({ ledgerId, type: 'expense', happenAt: _.gte(start).lte(end) })
+    .group({
+      _id: '$_openid',
+      total: $.sum('$amount'),
+      count: $.sum(1)
+    })
+    .end();
+  const memGroups = memAgg.list || memAgg.data || [];
+
+  let income = 0;
+  let expense = 0;
+  catGroups.forEach(g => {
+    if (g._id.type === 'income') income += g.total;
+    else expense += g.total;
+  });
+
+  // 成员贡献 + 成员昵称信息
+  const members = doc.data.memberOpenids || [];
+  const memberStats = memGroups.map(g => ({
+    openid: g._id,
+    total: g.total,
+    count: g.count,
+    isOwner: g._id === doc.data.ownerOpenid
+  })).sort((a, b) => b.total - a.total);
+
+  return {
+    code: 0,
+    data: {
+      totals: { income, expense },
+      categories: catGroups,
+      members: memberStats,
+      memberCount: members.length
+    }
+  };
 }

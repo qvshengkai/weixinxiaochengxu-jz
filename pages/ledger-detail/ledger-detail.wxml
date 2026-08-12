@@ -26,6 +26,35 @@
       </view>
     </view>
 
+    <view class="ld-section-title">账本统计（近30天）</view>
+    <view class="ld-stats glass" wx:if="{{stats}}">
+      <view class="ld-stats-row">
+        <view class="ld-stat">
+          <view class="ld-stat-v num-font expense">¥{{stats.expenseText}}</view>
+          <view class="ld-stat-l">总支出</view>
+        </view>
+        <view class="ld-stat">
+          <view class="ld-stat-v num-font income">¥{{stats.incomeText}}</view>
+          <view class="ld-stat-l">总收入</view>
+        </view>
+        <view class="ld-stat">
+          <view class="ld-stat-v num-font">¥{{stats.netText}}</view>
+          <view class="ld-stat-l">净支出</view>
+        </view>
+      </view>
+
+      <view class="ld-stats-sub">成员贡献</view>
+      <view class="ld-member-stat" wx:for="{{stats.members}}" wx:key="openid">
+        <view class="ld-mstat-avatar">{{item.isOwner ? '👑' : '👤'}}</view>
+        <view class="ld-mstat-info">
+          <view class="ld-mstat-name">{{item.isOwner ? '创建者' : '成员'}}</view>
+          <view class="ld-mstat-count">{{item.count}} 笔</view>
+        </view>
+        <view class="ld-mstat-amount">¥{{item.totalText}}</view>
+      </view>
+      <view class="ld-stats-empty" wx:if="{{!stats.members.length}}">暂无成员支出</view>
+    </view>
+
     <view class="ld-section-title">账本记录</view>
     <view class="ld-list glass" wx:if="{{records.length}}">
       <view class="ld-record" wx:for="{{records}}" wx:key="_id">

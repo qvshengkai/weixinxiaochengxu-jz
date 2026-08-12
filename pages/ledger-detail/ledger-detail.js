@@ -11,7 +11,10 @@ Page({
     loading: true,
     isOwner: false,
     source: 'ledger',   // 记录来源标记：ledger 记账
-    showRecords: false
+    showRecords: false,
+    // 账本统计
+    stats: null,
+    statsLoading: false
   },
 
   async onLoad(options) {
@@ -21,6 +24,7 @@ Page({
     if (ledgerId) {
       await this.loadDetail();
       await this.loadRecords();
+      this.loadStats();
     }
   },
 
@@ -48,6 +52,36 @@ Page({
       this.setData({ records: records || [] });
     } catch (e) {
       console.error('load ledger records failed', e);
+    }
+  },
+
+  // 账本统计：全家汇总 + 成员贡献（金额在 JS 格式化，避免 WXML 复杂表达式）
+  async loadStats() {
+    this.setData({ statsLoading: true });
+    try {
+      const now = Date.now();
+      const start = now - 30 * 24 * 3600 * 1000; // 近30天
+      const stats = await call('ledger', { action: 'stats', ledgerId: this.data.ledgerId, start, end: now });
+      const expense = Number(stats.totals.expense) || 0;
+      const income = Number(stats.totals.income) || 0;
+      const net = expense - income;
+      const members = (stats.members || []).map(m => ({
+        ...m,
+        totalText: (Number(m.total) || 0).toFixed(2)
+      }));
+      this.setData({
+        stats: {
+          ...stats,
+          expenseText: expense.toFixed(2),
+          incomeText: income.toFixed(2),
+          netText: (net >= 0 ? '' : '-') + Math.abs(net).toFixed(2),
+          members
+        }
+      });
+    } catch (e) {
+      console.error('load ledger stats failed', e);
+    } finally {
+      this.setData({ statsLoading: false });
     }
   },
 
