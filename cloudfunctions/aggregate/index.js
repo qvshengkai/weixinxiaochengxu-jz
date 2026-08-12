@@ -25,10 +25,16 @@ exports.main = async (event) => {
       }
     }
 
-    // 构建 match：个人统计按 _openid，共享统计按 ledgerId
+    // 构建 match：个人统计按 _openid 且排除共享账本记录；共享统计按 ledgerId
     const matchCond = ledgerId
       ? { ledgerId, happenAt: _.gte(start).lte(end) }
-      : { _openid: OPENID, happenAt: _.gte(start).lte(end) };
+      : _.and([
+          { _openid: OPENID, happenAt: _.gte(start).lte(end) },
+          _.or([
+            { ledgerId: '' },
+            { ledgerId: _.exists(false) }
+          ])
+        ]);
 
     const aggRes = await db.collection('records').aggregate()
       .match(matchCond)

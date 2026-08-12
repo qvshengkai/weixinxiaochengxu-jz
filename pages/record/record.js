@@ -56,6 +56,7 @@ Page({
     }
     await this.loadCategories();
     this.initVoice();
+    this.loadLedgerInfo();
   },
 
   async loadCategories() {
@@ -78,11 +79,30 @@ Page({
     });
   },
 
+  // 加载当前生效的共享账本（storage 记忆 + 云端列表）
+  async loadLedgerInfo() {
+    const storageLedgerId = wx.getStorageSync('activeLedgerId') || '';
+    let ledgerList = [];
+    try {
+      const { call } = require('../../utils/cloud');
+      ledgerList = await call('ledger', { action: 'list' }) || [];
+    } catch (e) {
+      console.error('load ledger info failed', e);
+    }
+    const active = ledgerList.find(l => l._id === storageLedgerId) || null;
+    this.setData({
+      ledgerList,
+      activeLedgerId: active ? active._id : '',
+      activeLedgerName: active ? active.name : ''
+    });
+  },
+
   async onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 0, hidden: false });
     }
     await this.loadCategories();
+    this.loadLedgerInfo();
   },
 
   onHide() {

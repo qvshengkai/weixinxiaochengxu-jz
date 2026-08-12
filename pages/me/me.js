@@ -45,8 +45,12 @@ Page({
 
   async loadStats() {
     try {
-      const countRes = await db().collection('records').count();
+      // 个人统计：只算个人账（排除共享账本记录）
+      const cmd = db().command;
+      const personal = cmd.or([{ ledgerId: '' }, { ledgerId: cmd.exists(false) }]);
+      const countRes = await db().collection('records').where(personal).count();
       const res = await db().collection('records')
+        .where(personal)
         .orderBy('happenAt', 'desc')
         .limit(200)
         .get();

@@ -107,7 +107,10 @@ Page({
         raw = (await call('ledger', { action: 'myRecords', ledgerId, limit: 100 })) || [];
         this.setData({ viewOnly: true });
       } else {
+        // 个人账单：只显示个人账（ledgerId 为空/缺失），不混入共享账本数据
+        const cmd = db().command;
         const res = await db().collection('records')
+          .where(cmd.or([{ ledgerId: '' }, { ledgerId: cmd.exists(false) }]))
           .orderBy('happenAt', 'desc')
           .limit(100)
           .get();
