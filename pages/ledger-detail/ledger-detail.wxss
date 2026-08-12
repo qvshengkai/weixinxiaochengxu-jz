@@ -52,3 +52,16 @@
 }
 
 .ld-loading { text-align: center; padding: 60rpx; color: #9b8aa8; font-size: 24rpx; }
+
+/* 邀请按钮（open-type=share）去掉 button 默认样式 */
+button.nav-share,
+button.ld-btn {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  line-height: normal;
+}
+button.nav-share::after,
+button.ld-btn::after { border: none; }
+.nav-share { font-size: 28rpx; color: #8F466D; font-weight: 700; }

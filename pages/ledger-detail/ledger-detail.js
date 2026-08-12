@@ -51,7 +51,8 @@ Page({
     }
   },
 
-  // 分享邀请
+  // 分享给好友（open-type="share" 按钮直接拉起微信分享面板）
+  // 好友点击分享卡片 → 打开 ledger-list?ledgerId=xxx → onLoad 自动加入
   onShareAppMessage() {
     const ledger = this.data.ledger || {};
     return {
@@ -59,20 +60,6 @@ Page({
       path: `/pages/ledger-list/ledger-list?ledgerId=${this.data.ledgerId}`,
       imageUrl: ''
     };
-  },
-
-  // 分享给好友（拉起分享面板）
-  inviteFriend() {
-    wx.showToast({ title: '点击右上角··· 分享给好友', icon: 'none' });
-  },
-
-  // 复制邀请链接（文本形式）
-  copyInviteLink() {
-    const link = `https://mp.weixin.qq.com/xxx?ledgerId=${this.data.ledgerId}`;
-    wx.setClipboardData({
-      data: link,
-      success: () => wx.showToast({ title: '链接已复制，发给好友即可加入', icon: 'none' })
-    });
   },
 
   // 退出账本

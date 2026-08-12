@@ -4,7 +4,7 @@
   <view class="wx-nav" style="padding-top:{{statusBarH}}px">
     <text class="nav-back" bindtap="goBack">‹ 返回</text>
     <text class="nav-title">账本详情</text>
-    <text class="nav-share" bindtap="inviteFriend">邀请</text>
+    <button class="nav-share" open-type="share">邀请</button>
   </view>
 
   <scroll-view class="ld-body hide-scrollbar" scroll-y wx:if="{{ledger}}">
@@ -13,7 +13,7 @@
       <view class="ld-meta">{{ledger.memberOpenids.length}} 位成员 · {{ledger.recordCount}} 笔记录</view>
       <view class="ld-btns">
         <button class="ld-btn primary" bindtap="goRecord">记一笔</button>
-        <button class="ld-btn ghost" bindtap="inviteFriend">邀请成员</button>
+        <button class="ld-btn ghost" open-type="share">邀请成员</button>
       </view>
     </view>
 
