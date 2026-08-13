@@ -5,32 +5,23 @@
     <text class="nav-title">花哪去了</text>
   </view>
 
-  <!-- 账本切换：个人账 / 共享账 -->
+  <!-- 账本切换：只保留共享账本标签，点击切换个人/共享 -->
   <view class="ledger-switch-bar">
     <view
-      class="ledger-tag {{activeLedgerId===''?'sel':''}}"
-      data-id=""
-      bindtap="selectLedger"
-    >
-      <text class="lt-icon">🏠</text>
-      <text class="lt-text">个人账本</text>
-    </view>
-    <view
       wx:if="{{ledgerList.length}}"
-      class="ledger-tag {{activeLedgerId===ledgerList[0]._id?'sel':''}}"
-      data-id="{{ledgerList[0]._id}}"
-      bindtap="selectLedger"
+      class="ledger-tag {{activeLedgerId?'sel':''}}"
+      bindtap="toggleLedger"
     >
-      <text class="lt-icon">📒</text>
-      <text class="lt-text">{{ledgerList[0].name}}</text>
+      <text class="lt-icon">{{activeLedgerId?'📒':'🏠'}}</text>
+      <text class="lt-text">{{activeLedgerId?ledgerList[0].name:'个人账本'}}</text>
     </view>
     <view
       wx:if="{{!ledgerList.length}}"
-      class="ledger-tag disabled"
+      class="ledger-tag"
       bindtap="goLedgerManage"
     >
       <text class="lt-icon">📒</text>
-      <text class="lt-text">共享账本 · 去加入</text>
+      <text class="lt-text">加入共享账本</text>
     </view>
   </view>
 

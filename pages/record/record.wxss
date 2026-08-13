@@ -26,7 +26,8 @@
 
 /* 可滚动内容区 */
 .home-scroll {
-  height: calc(100vh - 120rpx);
+  flex: 1;
+  min-height: 0;
   padding: 0 36rpx 200rpx;
   box-sizing: border-box;
 }
@@ -465,6 +466,8 @@
 
 /* 账本切换条 */
 .ledger-switch-bar {
+  position: relative;
+  z-index: 5;
   display: flex;
   gap: 16rpx;
   padding: 0 28rpx 20rpx;
@@ -473,27 +476,25 @@
   display: flex;
   align-items: center;
   gap: 8rpx;
-  height: 52rpx;
-  padding: 0 22rpx;
-  border-radius: 26rpx;
-  background: rgba(255, 255, 255, .45);
-  border: 1rpx solid rgba(255, 255, 255, .55);
+  height: 56rpx;
+  padding: 0 24rpx;
+  border-radius: 28rpx;
+  background: rgba(255, 255, 255, .65);
+  border: 1rpx solid rgba(255, 255, 255, .8);
   color: #5e4e75;
-  font-size: 22rpx;
-  transition: all .2s;
+  font-size: 24rpx;
+  font-weight: 600;
+  box-shadow: 0 4rpx 12rpx rgba(80, 50, 110, .08);
 }
 .ledger-tag.sel {
   background: linear-gradient(135deg, #8fb7ea, #b79cea);
   border-color: transparent;
   color: #fff;
-  box-shadow: 0 6rpx 18rpx rgba(143, 183, 234, .35);
+  box-shadow: 0 6rpx 20rpx rgba(143, 183, 234, .45);
 }
-.ledger-tag.disabled {
-  opacity: .75;
-}
-.lt-icon { font-size: 22rpx; }
+.lt-icon { font-size: 24rpx; }
 .lt-text {
-  max-width: 220rpx;
+  max-width: 260rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

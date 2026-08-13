@@ -261,6 +261,27 @@ Page({
     wx.showToast({ title: ledger ? `已切换到「${ledger.name}」` : '已切换到个人账本', icon: 'none' });
   },
 
+  // 首页顶部单标签切换：有个人账则切共享，有共享账则切个人
+  toggleLedger() {
+    const hasLedger = this.data.ledgerList.length > 0;
+    if (!hasLedger) {
+      this.goLedgerManage();
+      return;
+    }
+    const ledger = this.data.ledgerList[0];
+    if (this.data.activeLedgerId) {
+      // 当前在共享账，切回个人
+      wx.setStorageSync('activeLedgerId', '');
+      this.setData({ activeLedgerId: '', activeLedgerName: '' });
+      wx.showToast({ title: '已切换到个人账本', icon: 'none' });
+    } else {
+      // 当前在个人账，切到共享账
+      wx.setStorageSync('activeLedgerId', ledger._id);
+      this.setData({ activeLedgerId: ledger._id, activeLedgerName: ledger.name });
+      wx.showToast({ title: `已切换到「${ledger.name}」`, icon: 'none' });
+    }
+  },
+
   goLedgerManage() {
     wx.navigateTo({ url: '/pages/ledger-list/ledger-list' });
   },
