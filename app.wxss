@@ -16,7 +16,7 @@ page {
   --lilac: #B79CEA;
   --sky-acc: #8FB7EA;
   --wxgreen: #3EBB6E;
-  --tabbar-h: 72rpx;
+  --tabbar-h: 96rpx;
 
   background: linear-gradient(180deg, #6E5AA8 0%, #9B84CB 40%, #F5CBDD 100%);
   color: var(--ink);
