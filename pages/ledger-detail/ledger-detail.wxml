@@ -8,6 +8,7 @@
   </view>
 
   <scroll-view class="ld-body hide-scrollbar" scroll-y wx:if="{{ledger}}">
+    <!-- 账本头部 -->
     <view class="ld-hero glass">
       <view class="ld-name">📒 {{ledger.name}}</view>
       <view class="ld-meta">{{ledger.memberOpenids.length}} 位成员 · {{ledger.recordCount}} 笔记录</view>
@@ -17,60 +18,78 @@
       </view>
     </view>
 
-    <view class="ld-section-title">成员（{{ledger.memberOpenids.length}}）</view>
-    <view class="ld-list glass">
-      <view class="ld-member" wx:for="{{ledger.memberOpenids}}" wx:key="*this">
-        <view class="ld-avatar">👤</view>
-        <view class="ld-mname">{{item === ledger.ownerOpenid ? '创建者' : '成员'}}</view>
-        <view class="ld-owner-badge" wx:if="{{item === ledger.ownerOpenid}}">👑</view>
+    <!-- Tab 切换 -->
+    <view class="ld-tabs">
+      <view
+        wx:for="{{tabs}}"
+        wx:key="key"
+        class="ld-tab {{activeTab===item.key?'sel':''}}"
+        data-key="{{item.key}}"
+        bindtap="switchTab"
+      >{{item.label}}</view>
+    </view>
+
+    <!-- 成员管理 -->
+    <view class="ld-tab-panel" wx:if="{{activeTab==='members'}}">
+      <view class="ld-section-title">成员（{{ledger.memberOpenids.length}}）</view>
+      <view class="ld-list glass">
+        <view class="ld-member" wx:for="{{ledger.memberOpenids}}" wx:key="*this">
+          <view class="ld-avatar">👤</view>
+          <view class="ld-mname">{{item === ledger.ownerOpenid ? '创建者' : '成员'}}</view>
+          <view class="ld-owner-badge" wx:if="{{item === ledger.ownerOpenid}}">👑</view>
+        </view>
+      </view>
+      <view class="ld-leave" bindtap="leaveLedger">{{isOwner ? '解散账本' : '退出账本'}}</view>
+    </view>
+
+    <!-- 账单历史 -->
+    <view class="ld-tab-panel" wx:if="{{activeTab==='records'}}">
+      <view class="ld-list glass" wx:if="{{records.length}}">
+        <view class="ld-record" wx:for="{{records}}" wx:key="_id">
+          <view class="ld-reco-icon">{{item.type === 'expense' ? '💸' : '💰'}}</view>
+          <view class="ld-reco-info">
+            <view class="ld-reco-name">{{item.categoryName || '其他'}}</view>
+            <view class="ld-reco-note">{{item.note || '—'}} · {{item.source}}</view>
+          </view>
+          <view class="ld-reco-amount {{item.type === 'expense' ? 'expense' : 'income'}}">{{item.type === 'expense' ? '-' : '+'}}¥{{item.amount}}</view>
+        </view>
+      </view>
+      <view class="ld-empty glass" wx:else>
+        <view class="ld-empty-txt">暂无记录，点「记一笔」开始记账</view>
       </view>
     </view>
 
-    <view class="ld-section-title">账本统计（近30天）</view>
-    <view class="ld-stats glass" wx:if="{{stats}}">
-      <view class="ld-stats-row">
-        <view class="ld-stat">
-          <view class="ld-stat-v num-font expense">¥{{stats.expenseText}}</view>
-          <view class="ld-stat-l">总支出</view>
+    <!-- 账单统计 -->
+    <view class="ld-tab-panel" wx:if="{{activeTab==='stats'}}">
+      <view class="ld-stats glass" wx:if="{{stats}}">
+        <view class="ld-stats-row">
+          <view class="ld-stat">
+            <view class="ld-stat-v num-font expense">¥{{stats.expenseText}}</view>
+            <view class="ld-stat-l">总支出</view>
+          </view>
+          <view class="ld-stat">
+            <view class="ld-stat-v num-font income">¥{{stats.incomeText}}</view>
+            <view class="ld-stat-l">总收入</view>
+          </view>
+          <view class="ld-stat">
+            <view class="ld-stat-v num-font">¥{{stats.netText}}</view>
+            <view class="ld-stat-l">净支出</view>
+          </view>
         </view>
-        <view class="ld-stat">
-          <view class="ld-stat-v num-font income">¥{{stats.incomeText}}</view>
-          <view class="ld-stat-l">总收入</view>
-        </view>
-        <view class="ld-stat">
-          <view class="ld-stat-v num-font">¥{{stats.netText}}</view>
-          <view class="ld-stat-l">净支出</view>
-        </view>
-      </view>
 
-      <view class="ld-stats-sub">成员贡献</view>
-      <view class="ld-member-stat" wx:for="{{stats.members}}" wx:key="openid">
-        <view class="ld-mstat-avatar">{{item.isOwner ? '👑' : '👤'}}</view>
-        <view class="ld-mstat-info">
-          <view class="ld-mstat-name">{{item.isOwner ? '创建者' : '成员'}}</view>
-          <view class="ld-mstat-count">{{item.count}} 笔</view>
+        <view class="ld-stats-sub">成员贡献</view>
+        <view class="ld-member-stat" wx:for="{{stats.members}}" wx:key="openid">
+          <view class="ld-mstat-avatar">{{item.isOwner ? '👑' : '👤'}}</view>
+          <view class="ld-mstat-info">
+            <view class="ld-mstat-name">{{item.isOwner ? '创建者' : '成员'}}</view>
+            <view class="ld-mstat-count">{{item.count}} 笔</view>
+          </view>
+          <view class="ld-mstat-amount">¥{{item.totalText}}</view>
         </view>
-        <view class="ld-mstat-amount">¥{{item.totalText}}</view>
+        <view class="ld-stats-empty" wx:if="{{!stats.members.length}}">暂无成员支出</view>
       </view>
-      <view class="ld-stats-empty" wx:if="{{!stats.members.length}}">暂无成员支出</view>
+      <view class="ld-loading" wx:if="{{statsLoading}}">统计加载中…</view>
     </view>
-
-    <view class="ld-section-title">账本记录</view>
-    <view class="ld-list glass" wx:if="{{records.length}}">
-      <view class="ld-record" wx:for="{{records}}" wx:key="_id">
-        <view class="ld-reco-icon">{{item.type === 'expense' ? '💸' : '💰'}}</view>
-        <view class="ld-reco-info">
-          <view class="ld-reco-name">{{item.categoryName || '其他'}}</view>
-          <view class="ld-reco-note">{{item.note || '—'}} · {{item.source}}</view>
-        </view>
-        <view class="ld-reco-amount {{item.type === 'expense' ? 'expense' : 'income'}}">{{item.type === 'expense' ? '-' : '+'}}¥{{item.amount}}</view>
-      </view>
-    </view>
-    <view class="ld-empty glass" wx:else>
-      <view class="ld-empty-txt">暂无记录，点「记一笔」开始记账</view>
-    </view>
-
-    <view class="ld-leave" bindtap="leaveLedger">{{isOwner ? '解散账本' : '退出账本'}}</view>
   </scroll-view>
 
   <view class="ld-loading" wx:if="{{loading}}">加载中…</view>

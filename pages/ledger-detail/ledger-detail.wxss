@@ -11,8 +11,13 @@ view, button, scroll-view, text {
   padding: 0 28rpx 16rpx;
   color: #4a3b5c; font-weight: 700;
 }
-.nav-back { font-size: 28rpx; color: #8F466D; }
-.nav-title { font-size: 34rpx; }
+.nav-back { font-size: 28rpx; color: #8F466D; width: 100rpx; }
+.nav-title {
+  font-size: 34rpx;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
 .nav-share { font-size: 28rpx; color: #8F466D; }
 
 .ld-body {
@@ -77,7 +82,17 @@ button.ld-btn {
 }
 button.nav-share::after,
 button.ld-btn::after { border: none; }
-.nav-share { font-size: 28rpx; color: #8F466D; font-weight: 700; height: auto; line-height: 1; }
+.nav-share {
+  font-size: 28rpx;
+  color: #8F466D;
+  font-weight: 700;
+  height: auto;
+  line-height: 1;
+  width: auto;
+  min-width: 0;
+  flex-shrink: 0;
+  padding: 8rpx 0 8rpx 20rpx;
+}
 
 /* 账本统计 */
 .ld-stats { padding: 28rpx 24rpx; border-radius: 28rpx; overflow: hidden; }
@@ -87,6 +102,33 @@ button.ld-btn::after { border: none; }
 .ld-stat-v.expense { color: #e06a6a; }
 .ld-stat-v.income { color: #4caf7d; }
 .ld-stat-l { margin-top: 6rpx; font-size: 20rpx; color: #9b8aa8; }
+
+
+/* 账本 Tab 切换 */
+.ld-tabs {
+  display: flex;
+  gap: 10rpx;
+  margin: 0 4rpx 16rpx;
+  padding: 6rpx;
+  border-radius: 32rpx;
+  background: #f3e9f7;
+}
+.ld-tab {
+  flex: 1;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 26rpx;
+  font-size: 24rpx;
+  color: #806b94;
+}
+.ld-tab.sel {
+  color: #fff;
+  background: linear-gradient(135deg, #8fb7ea, #b79cea);
+  box-shadow: 0 6rpx 16rpx rgba(177,125,183,.25);
+}
+.ld-tab-panel { min-height: 200rpx; }
 
 .ld-stats-sub { margin: 24rpx 0 10rpx; font-size: 22rpx; color: #9b8aa8; }
 .ld-member-stat {

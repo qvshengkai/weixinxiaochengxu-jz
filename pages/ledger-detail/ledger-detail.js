@@ -14,7 +14,14 @@ Page({
     showRecords: false,
     // 账本统计
     stats: null,
-    statsLoading: false
+    statsLoading: false,
+    // tab 切换：members / records / stats
+    activeTab: 'records',
+    tabs: [
+      { key: 'members', label: '成员管理' },
+      { key: 'records', label: '账单历史' },
+      { key: 'stats', label: '账单统计' }
+    ]
   },
 
   async onLoad(options) {
@@ -23,9 +30,16 @@ Page({
     this.setData({ statusBarH: info.statusBarHeight || 20, ledgerId });
     if (ledgerId) {
       await this.loadDetail();
-      await this.loadRecords();
-      this.loadStats();
+      this.switchTab({ currentTarget: { dataset: { key: 'records' } } });
     }
+  },
+
+  // 切换 tab：懒加载对应数据
+  switchTab(e) {
+    const key = e.currentTarget.dataset.key;
+    this.setData({ activeTab: key });
+    if (key === 'records' && !this.data.records.length) this.loadRecords();
+    if (key === 'stats' && !this.data.stats) this.loadStats();
   },
 
   goBack() { wx.navigateBack(); },
