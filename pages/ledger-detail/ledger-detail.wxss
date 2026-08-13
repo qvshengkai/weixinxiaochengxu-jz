@@ -18,6 +18,7 @@ view, button, scroll-view, text {
   left: 50%;
   transform: translateX(-50%);
 }
+.nav-placeholder { width: 100rpx; }
 .nav-share { font-size: 28rpx; color: #8F466D; }
 
 .ld-body {
@@ -70,18 +71,7 @@ view, button, scroll-view, text {
 .ld-loading { text-align: center; padding: 60rpx; color: #9b8aa8; font-size: 24rpx; }
 
 /* 邀请按钮（open-type=share）去掉 button 默认样式 */
-button.nav-share,
-button.ld-btn {
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-button.nav-share::after,
-button.ld-btn::after { border: none; }
+
 .nav-share {
   font-size: 28rpx;
   color: #8F466D;

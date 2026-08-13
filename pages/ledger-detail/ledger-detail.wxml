@@ -4,7 +4,7 @@
   <view class="wx-nav" style="padding-top:{{statusBarH}}px">
     <text class="nav-back" bindtap="goBack">‹ 返回</text>
     <text class="nav-title">账本详情</text>
-    <button class="nav-share" open-type="share">邀请</button>
+    <view class="nav-placeholder"></view>
   </view>
 
   <scroll-view class="ld-body hide-scrollbar" scroll-y wx:if="{{ledger}}">

@@ -1,5 +1,8 @@
 /* pages/ledger-list/ledger-list.wxss */
-.page { min-height: 100vh; display: flex; flex-direction: column; }
+view, button, scroll-view, input, text {
+  box-sizing: border-box;
+}
+.page { min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
 .wx-nav {
   position: relative;
@@ -11,11 +14,23 @@
   color: #4a3b5c;
   font-weight: 700;
 }
-.nav-back { font-size: 28rpx; color: #8F466D; }
-.nav-title { font-size: 34rpx; }
-.nav-placeholder { width: 60rpx; }
+.nav-back { font-size: 28rpx; color: #8F466D; width: 100rpx; flex-shrink: 0; }
+.nav-title {
+  font-size: 34rpx;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.nav-placeholder { width: 100rpx; flex-shrink: 0; }
 
-.ledger-body { flex: 1; padding: 0 28rpx 40rpx; }
+.ledger-body {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  padding: 0 28rpx 40rpx;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
 .ledger-summary {
   margin: 16rpx 0 28rpx;
   padding: 28rpx;
@@ -91,3 +106,12 @@
   background: linear-gradient(135deg, #8fb7ea, #b79cea);
 }
 .create-btn[disabled] { opacity: .6; }
+
+/* 防溢出 */
+.ledger-sum-title, .ledger-sum-tip, .ledger-name, .ledger-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ledger-info { min-width: 0; }
+.ledger-chev { flex-shrink: 0; }
