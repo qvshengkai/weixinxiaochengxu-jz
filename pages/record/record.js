@@ -40,6 +40,9 @@ Page({
     composerMode: 'ai',
     source: 'manual',
     dateVisible: false,
+    ledgerList: [],
+    activeLedgerId: '',
+    activeLedgerName: '',
     ...createRecordEntryState(DEFAULT_CATEGORIES.find(c => c.type === 'expense').id)
   },
 

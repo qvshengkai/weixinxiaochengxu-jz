@@ -462,3 +462,39 @@
 .vo-bar { width: 10rpx; height: 48rpx; border-radius: 6rpx; background: linear-gradient(180deg,#8FB7EA,#E4789F); }
 .vo-txt { color: #F1E4FA; font-size: 26rpx; font-weight: 600; }
 .vo-cancel { margin-top: 4rpx; padding: 10rpx 28rpx; border-radius: 28rpx; color: #fff; background: rgba(255,255,255,.22); font-size: 24rpx; }
+
+/* 账本切换条 */
+.ledger-switch-bar {
+  display: flex;
+  gap: 16rpx;
+  padding: 0 28rpx 20rpx;
+}
+.ledger-tag {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  height: 52rpx;
+  padding: 0 22rpx;
+  border-radius: 26rpx;
+  background: rgba(255, 255, 255, .45);
+  border: 1rpx solid rgba(255, 255, 255, .55);
+  color: #5e4e75;
+  font-size: 22rpx;
+  transition: all .2s;
+}
+.ledger-tag.sel {
+  background: linear-gradient(135deg, #8fb7ea, #b79cea);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 6rpx 18rpx rgba(143, 183, 234, .35);
+}
+.ledger-tag.disabled {
+  opacity: .75;
+}
+.lt-icon { font-size: 22rpx; }
+.lt-text {
+  max-width: 220rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
